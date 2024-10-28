@@ -7,34 +7,40 @@ const commentPatterns = {
     js: {
         singleLine: /\/\/.*$/gm,
         multiLine: /\/\*[\s\S]*?\*\//g,
-        regex:/^\/\/.*/
+        regex: /^\/\/.*/
     },
     java: {
         singleLine: /\/\/.*$/gm,
-        multiLine: /\/\*[\s\S]*?\*\//g
+        multiLine: /\/\*[\s\S]*?\*\//g,
+        regex: /^\/\/.*/
     },
     py: {
         singleLine: /#.*$/gm,
-        multiLine: /(['"]{3})[\s\S]*?\1/g
+        multiLine: /(['"]{3})[\s\S]*?\1/g,
+        regex: /^#/
     },
     xml: {
-        multiLine: /<!--[\s\S]*?-->/g
+        multiLine: /<!--\s*[\s\S]*?\s*-->/g,
+        regex: /^<!/,
+        xml: "xml"
     },
-    html: {
-        singleLine: /\/\/.*$/gm,
-        multiLine: /<!--[\s\S]*?-->|\/\*[\s\S]*?\*\//g
-    },
-    lua: {
-        singleLine: /--.*$/gm,
-        multiLine: /--\[\[[\s\S]*?\]\]/g
-    },
+    // html: {
+    //     singleLine: /\/\/.*$/gm,
+    //     multiLine: /<!--[\s\S]*?-->|\/\*[\s\S]*?\*\//g
+    // },
+    // lua: {
+    //     singleLine: /--.*$/gm,
+    //     multiLine: /--\[\[[\s\S]*?\]\]/g
+    // },
     cs: {
         singleLine: /\/\/.*$/gm,
-        multiLine: /\/\*[\s\S]*?\*\//g
+        multiLine: /\/\*[\s\S]*?\*\//g,
+        regex: /^\/\/.*/
     },
     php: {
         singleLine: /\/\/.*$|#.*$/gm,
-        multiLine: /\/\*[\s\S]*?\*\//g
+        multiLine: /\/\*[\s\S]*?\*\//g,
+        regex: /^(?:\/\/|\#).*$/
     },
     css: {
         multiLine: /\/\*[\s\S]*?\*\//g
@@ -73,23 +79,35 @@ function countLinesInDirectory(dirPath) {
             if (line.trim() === '') emptyLines++;
             else {
                 codeLines++;
+                if (patterns.regex) {
+                    if (line.trim().match(patterns.regex)) {
+                        console.log(line);
+                        commentLineCount++;
+                    }
+                }
             }
         });
 
-        单行注释行数统计
-        if (patterns.singleLine) {
-            const singleLineComments = data.match(patterns.singleLine) || [];
-            commentLineCount += singleLineComments.length;
-            console.log(`${singleLineComments}`);
-        }
+        // 单行注释行数统计
+        // if (patterns.singleLine) {
+        //     const singleLineComments = data.match(patterns.singleLine) || [];
+        //     commentLineCount += singleLineComments.length;
+        //     console.log(`${singleLineComments}`);
+        // }
 
-        // 多行注释行数统计
+        //多行注释行数统计
         if (patterns.multiLine) {
             const multiLineComments = data.match(patterns.multiLine) || [];
             multiLineComments.forEach(comment => {
-                commentLineCount += comment.split('\n').length;
+                console.log(comment);
+                if (patterns.xml) {//xml文件处理，需要优化
+                    if (comment.split('\n').length != 1) {
+                        commentLineCount += comment.split('\n').length - 1;//-1是因为xml文件中匹配单行的时候增加了
+                    }
+                } else {
+                    commentLineCount += comment.split('\n').length;
+                }
             });
-            
         }
         console.log(`文件: ${dirPath} 总行数: ${lineCount}  空行数: ${emptyLines} 注释行数: ${commentLineCount}`);//
     });
