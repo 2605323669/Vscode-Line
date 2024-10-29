@@ -26,15 +26,11 @@ const commentPatterns = {
     },
     html: {
         singleLine: /\/\/.*$/gm,
-        multiLine: /<!--[\s\S]*?-->|\/\*[\s\S]*?\*\//g,
-        regex: /^\/\/.*/
+        multiLine: /<!--[\s\S]*?-->|\/\*[\s\S]*?\*\//g
     },
     lua: {
         singleLine: /--.*$/gm,
-        multiLine: /--\[\[[\s\S]*?\]\]/g,
-        regex: /^--.*/,
-        regex1: /^--\[\[/,
-        regex2: /^--\]\]/
+        multiLine: /--\[\[[\s\S]*?\]\]/g
     },
     cs: {
         singleLine: /\/\/.*$/gm,
@@ -83,17 +79,6 @@ function countLinesInDirectory(dirPath) {
             if (line.trim() === '') emptyLines++;
             else {
                 codeLines++;
-                if (patterns.regex) {
-                    if (line.trim().match(patterns.regex)) {
-                        // console.log(line);
-                        commentLineCount++;
-                    }
-                    if (patterns.regex1) {//用来处理lua文件
-                        if (line.trim().match(patterns.regex1) || line.trim().match(patterns.regex2)) {
-                            commentLineCount--;
-                        }
-                    }
-                }
             }
         });
 
@@ -108,15 +93,7 @@ function countLinesInDirectory(dirPath) {
         if (patterns.multiLine) {
             const multiLineComments = data.match(patterns.multiLine) || [];
             multiLineComments.forEach(comment => {
-                // console.log(comment);
-                if (patterns.xml) {//xml文件处理，需要优化
-                    if (comment.split('\n').length != 1) {
-                        commentLineCount += comment.split('\n').length - 1;//-1是因为xml文件中匹配单行的时候增加了
-                    }
-                } else {
-                    // console.log(comment);
-                    commentLineCount += comment.split('\n').length;
-                }
+                commentLineCount += comment.split('\n').length;
             });
         }
         console.log(`文件: ${dirPath} 总行数: ${lineCount}  空行数: ${emptyLines} 注释行数: ${commentLineCount}`);//
