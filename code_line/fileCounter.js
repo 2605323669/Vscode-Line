@@ -1,56 +1,9 @@
 const fs = require("fs")
+const commentPatterns = require("./commentPatterns");
 /**
  * 用来统计代码行量
  * @param {*} dirPath 
  */
-const commentPatterns = {
-    js: {
-        singleLine: /\/\/.*$/gm,
-        multiLine: /\/\*[\s\S]*?\*\//g,
-        regex: /^\/\/.*/
-    },
-    java: {
-        singleLine: /\/\/.*$/gm,
-        multiLine: /\/\*[\s\S]*?\*\//g,
-        regex: /^\/\/.*/
-    },
-    py: {
-        singleLine: /#.*$/gm,
-        multiLine: /(['"]{3})[\s\S]*?\1/g,
-        regex: /^#/
-    },
-    xml: {
-        multiLine: /<!--\s*[\s\S]*?\s*-->/g,
-        regex: /^<!/,
-        xml: "xml"
-    },
-    html: {
-        singleLine: /\/\/.*$/gm,
-        multiLine: /<!--[\s\S]*?-->|\/\*[\s\S]*?\*\//g,
-        regex: /^\/\/.*/
-    },
-    lua: {
-        singleLine: /--.*$/gm,
-        multiLine: /--\[\[[\s\S]*?\]\]/g,
-        regex: /^--.*/,
-        regex1: /^--\[\[/,
-        regex2: /^--\]\]/
-    },
-    cs: {
-        singleLine: /\/\/.*$/gm,
-        multiLine: /\/\*[\s\S]*?\*\//g,
-        regex: /^\/\/.*/
-    },
-    php: {
-        singleLine: /\/\/.*$|#.*$/gm,
-        multiLine: /\/\*[\s\S]*?\*\//g,
-        regex: /^(?:\/\/|\#).*$/
-    },
-    css: {
-        multiLine: /\/\*[\s\S]*?\*\//g
-    }
-};
-
 // 根据文件类型选择适当的注释正则表达式
 function getCommentPatternsByExtension(fileName) {
     // 提取文件后缀
@@ -75,25 +28,20 @@ function countLinesInDirectory(dirPath) {
         }
         const lineCount = data.split('\n').length;
         const lines = data.split('\n');
-
         const patterns = getCommentPatternsByExtension(dirPath);
-
         lines.forEach(line => {
             //trim()方法将空白字符转换为空字符串
             if (line.trim() === '') emptyLines++;
             else {
-                codeLines++;
                 if (patterns.regex) {
                     if (line.trim().match(patterns.regex)) {
-                        // console.log(line);
                         commentLineCount++;
                     }
-                    if (patterns.regex1) {//用来处理lua文件
+                    if (patterns.regex1) { //用来处理lua文件 --               --[[--]]
                         if (line.trim().match(patterns.regex1) || line.trim().match(patterns.regex2)) {
                             commentLineCount--;
                         }
                     }
-                    // console.log("``````````````````````````````````````````````````````````````````````line``````````````````````````````````````````````````````````````````````");
                 }
             }
         });
@@ -115,11 +63,11 @@ function countLinesInDirectory(dirPath) {
                     }
                 } else {
                     commentLineCount += comment.split('\n').length;
-                    // console.log(comment)
                 }
             });
         }
-        console.log(`文件: ${dirPath} 总行数: ${lineCount}  空行数: ${emptyLines} 注释行数: ${commentLineCount}`);//
+        codeLines = lineCount - emptyLines - commentLineCount;
+        console.log(`文件: ${dirPath} 总行数: ${lineCount}  空行数: ${emptyLines} 注释行数: ${commentLineCount} 有效代码行数: ${codeLines} `);//
     });
 }
 module.exports = {

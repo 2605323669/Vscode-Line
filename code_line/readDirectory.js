@@ -1,6 +1,7 @@
 const fs = require("fs")
 const path = require("path")
 const countLines = require("./fileCounter")
+const validFileExtensions = ['.js', '.py', '.java', '.xml', '.html', '.lua', '.cs', '.php', '.css'];
 
 // filePath = "F:\\node_pkg\\code_line\\fileCounter.js"
 function findFiles(filePath) {
@@ -19,7 +20,9 @@ function findFiles(filePath) {
                 if (stats.isDirectory()) {//判断是否为目录
                     findFiles(currentFilePath);
                 } else {
-                    countLines.countLinesInDirectory(currentFilePath)
+                    const ext = path.extname(currentFilePath);
+                    if (validFileExtensions.includes(ext))
+                        countLines.countLinesInDirectory(currentFilePath)
                 }
             }
         } else if (stats.isFile()) {
