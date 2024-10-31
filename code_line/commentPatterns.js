@@ -15,7 +15,7 @@ module.exports ={
         regex: /^#/
     },
     xml: {
-        multiLine: /<!--\s*[\s\S]*?\s*-->/g,
+        multiLine: /<!--\s*[\s\S]*?\s*-->/g,//<!-- 这是一个XML文件 -->
         regex: /^<!/,
         xml: "xml"
     },
