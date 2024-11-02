@@ -33,15 +33,16 @@ function countLinesInDirectory(dirPath) {
             //trim()方法将空白字符转换为空字符串
             if (line.trim() === '') emptyLines++;
             else {
-                if (patterns.regex) {
-                    if (line.trim().match(patterns.regex)) {
+                if (patterns.singleLine) {
+                    if (line.trim().match(patterns.singleLine)) {
+                        // console.log(line);
                         commentLineCount++;
                     }
-                    if (patterns.regex1) { //用来处理lua文件 --               --[[--]]
-                        if (line.trim().match(patterns.regex1) || line.trim().match(patterns.regex2)) {
-                            commentLineCount--;
-                        }
-                    }
+                    // if (patterns.regex1) { //用来处理lua文件 --               --[[--]]
+                    //     if (line.trim().match(patterns.regex1) || line.trim().match(patterns.regex2)) {
+                    //         commentLineCount--;
+                    //     }
+                    // }
                 }
             }
         });
@@ -57,13 +58,15 @@ function countLinesInDirectory(dirPath) {
         if (patterns.multiLine) {
             const multiLineComments = data.match(patterns.multiLine) || [];
             multiLineComments.forEach(comment => {
-                if (patterns.xml) {//xml文件处理，需要优化
-                    if (comment.split('\n').length != 1) {
-                        commentLineCount += comment.split('\n').length - 1;//-1是因为xml文件中匹配单行的时候增加了
-                    }
-                } else {
-                    commentLineCount += comment.split('\n').length;
-                }
+                // if (patterns.xml) {//xml文件处理，需要优化
+                //     if (comment.split('\n').length != 1) {
+                //         commentLineCount += comment.split('\n').length - 1;//-1是因为xml文件中匹配单行的时候增加了
+                //     }
+                // } else {
+                //     commentLineCount += comment.split('\n').length;
+                // }
+                // console.log(comment);
+                commentLineCount += comment.split('\n').length;
             });
         }
         codeLines = lineCount - emptyLines - commentLineCount;

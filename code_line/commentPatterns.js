@@ -1,45 +1,42 @@
 module.exports ={
     js: {
-        singleLine: /\/\/.*$/gm,
+        // singleLine: /\/\/.*$/gm,
         multiLine: /\/\*[\s\S]*?\*\//g,
-        regex: /^\/\/.*/
+        singleLine: /^\/\/.*/
     },
     java: {
-        singleLine: /\/\/.*$/gm,
+        // singleLine: /\/\/.*$/gm,
         multiLine: /\/\*[\s\S]*?\*\//g,
-        regex: /^\/\/.*/
+        singleLine: /^\/\/.*/
     },
     py: {
-        singleLine: /#.*$/gm,
+        // singleLine: /#.*$/gm,
         multiLine: /(['"]{3})[\s\S]*?\1/g,
-        regex: /^#/
+        singleLine: /^#/
     },
     xml: {
-        multiLine: /<!--\s*[\s\S]*?\s*-->/g,//<!-- 这是一个XML文件 -->
-        regex: /^<!/,
-        xml: "xml"
+        singleLine:/^<!--.*?-->/gm,
+        multiLine: /<!--[^\n]*\n(?:.*\n)*?[^-]*-->/g,//<!-- 这是一个XML文件 -->
     },
     html: {
-        singleLine: /\/\/.*$/gm,
+        // singleLine: /\/\/.*$/gm,
         multiLine: /<!--[\s\S]*?-->|\/\*[\s\S]*?\*\//g,
-        regex: /^\/\/.*/
+        singleLine: /^\/\/.*/
     },
     lua: {
-        singleLine: /--.*$/gm,
+        // singleLine: /--.*$/gm,
         multiLine: /--\[\[[\s\S]*?\]\]/g,
-        regex: /^--.*/,
-        regex1: /^--\[\[/,
-        regex2: /^--\]\]/
+        singleLine:/^(?<!\[)--(?!\[|\])/
     },
     cs: {
-        singleLine: /\/\/.*$/gm,
+        // singleLine: /\/\/.*$/gm,
         multiLine: /\/\*[\s\S]*?\*\//g,
-        regex: /^\/\/.*/
+        singleLine: /^\/\/.*/
     },
     php: {
-        singleLine: /\/\/.*$|#.*$/gm,
+        // singleLine: /\/\/.*$|#.*$/gm,
         multiLine: /\/\*[\s\S]*?\*\//g,
-        regex: /^(?:\/\/|\#).*$/
+        singleLine: /^(?:\/\/|\#).*$/
     },
     css: {
         multiLine: /\/\*[\s\S]*?\*\//g
