@@ -1,12 +1,13 @@
 const fs = require("fs")
 const path = require("path")
 const countLines = require("./fileCounter")
-const validFileExtensions = ['.js', '.py', '.java', '.xml', '.html', '.lua', '.cs', '.php', '.css']
+const validFileExtensions = ['.js', '.py', '.java', '.xml', '.html', '.lua', '.cs', '.php', '.css', '.vue']
 // const blacklist = ['\\node_modules', '\\vendor']
 // let blacklist = [];
 // const blacklistData = fs.readFileSync(path.join(__dirname, 'blacklist.json'), 'utf8');
 // blacklist = JSON.parse(blacklistData);
-const blacklist = require('./blackList'); 
+const blacklist = require('./blackList');
+const { log } = require("console");
 function isBlackListed(filePath, blacklist) {
     for (let pattern of blacklist) {
         if (filePath.includes(pattern)) {
@@ -16,7 +17,7 @@ function isBlackListed(filePath, blacklist) {
     return false;
 }
 
-function findFiles(filePath) {
+function findFiles(filePath, promises) {
     if (fs.existsSync(filePath)) {//判断文件目录是否存在
         if (!isBlackListed(filePath, blacklist)) {
             let stats = fs.statSync(filePath)//获取文件信息
@@ -26,21 +27,45 @@ function findFiles(filePath) {
                     let currentFilePath = path.join(filePath, files[i])//处理路径拼接
                     stats = fs.statSync(currentFilePath)//获取文件信息
                     if (stats.isDirectory()) {//判断是否为目录
-                        findFiles(currentFilePath);
+                        findFiles(currentFilePath, promises);
                     } else {
                         const ext = path.extname(currentFilePath);
                         if (validFileExtensions.includes(ext))
-                            countLines.countLinesInDirectory(currentFilePath)
+                            promises.push(countLines.countLinesInDirectory(currentFilePath));
                     }
                 }
             } else if (stats.isFile()) {
-                countLines.countLinesInDirectory(filePath)
+                promises.push(countLines.countLinesInDirectory(filePath));
             }
         }
     } else {
         console.log("您输入的目录不存在！")
     }
 }
+async function calculateTotalLines(directory) {
+    const promises = [];
+    findFiles(directory, promises);
+    const results = await Promise.all(promises);
+    const languageCodeLines = {};
+    let totalCodeLines = 0;
 
+    results.forEach(({ extension, codeLines }) => {
+        if (!languageCodeLines[extension]) {
+            languageCodeLines[extension] = 0;
+        }
+        languageCodeLines[extension] += codeLines;
+        totalCodeLines += codeLines;
+    });
+    let output = '每种语言的有效代码行数：';
+    // console.log("每种语言的有效代码行数：");
+    if (languageCodeLines) {
+        for (let extension in languageCodeLines) {
+            output += `${extension}: ${languageCodeLines[extension]} `
+        }
+    }
+    console.log(output);
+    // console.log("每种语言的有效代码行数：", languageCodeLines);
+    console.log(`所有文件的有效代码总行数: ${totalCodeLines}`);
+}
 
-module.exports = { findFiles };
+module.exports = { calculateTotalLines };

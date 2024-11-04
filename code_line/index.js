@@ -3,10 +3,12 @@ const readDirectory = require("./readDirectory");
 const params = process.argv.slice(2);  // 使用 slice 而不是 splice，第二个参数是传入的目录路径
 // const filePath = params[0];
 const filePath = "C:\\Users\\86158\\Desktop\\开源软件\\Test"
+// "F:\\node_pkg"
+// F:\\毕业设计\\毕业设计\\毕业设计2
 //C:\Users\86158\Desktop\开源软件\Tests
-//C:\Users\86158\Desktop\开源软件\Test\example.py
+//C:\Users\86158\Desktop\开源软件\Test\example.pys
 if (!filePath) {
     console.error('请提供一个目录路径作为参数');
     process.exit(1);  // 如果没有提供目录路径，则退出程序  
 }
-readDirectory.findFiles(filePath);
+readDirectory.calculateTotalLines(filePath);

@@ -1,4 +1,4 @@
-module.exports ={
+module.exports = {
     js: {
         // singleLine: /\/\/.*$/gm,
         multiLine: /\/\*[\s\S]*?\*\//g,
@@ -15,7 +15,7 @@ module.exports ={
         singleLine: /^#/
     },
     xml: {
-        singleLine:/^<!--.*?-->/gm,
+        singleLine: /^<!--.*?-->/,
         multiLine: /<!--[^\n]*\n(?:.*\n)*?[^-]*-->/g,//<!-- 这是一个XML文件 -->
     },
     html: {
@@ -26,7 +26,7 @@ module.exports ={
     lua: {
         // singleLine: /--.*$/gm,
         multiLine: /--\[\[[\s\S]*?\]\]/g,
-        singleLine:/^(?<!\[)--(?!\[|\])/
+        singleLine: /^(?<!\[)--(?!\[|\])/
     },
     cs: {
         // singleLine: /\/\/.*$/gm,
@@ -40,5 +40,9 @@ module.exports ={
     },
     css: {
         multiLine: /\/\*[\s\S]*?\*\//g
+    },
+    vue: {
+        singleLine: /^\/\/.*|^<!--.*?-->/,
+        multiLine:/\/\*[\s\S]*?\*\/|<!--[^\n]*\n(?:.*\n)*?[^-]*-->/g
     }
 }
