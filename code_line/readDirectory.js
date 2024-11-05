@@ -2,12 +2,8 @@ const fs = require("fs")
 const path = require("path")
 const countLines = require("./fileCounter")
 const validFileExtensions = ['.js', '.py', '.java', '.xml', '.html', '.lua', '.cs', '.php', '.css', '.vue']
-// const blacklist = ['\\node_modules', '\\vendor']
-// let blacklist = [];
-// const blacklistData = fs.readFileSync(path.join(__dirname, 'blacklist.json'), 'utf8');
-// blacklist = JSON.parse(blacklistData);
 const blacklist = require('./blackList');
-const { log } = require("console");
+
 function isBlackListed(filePath, blacklist) {
     for (let pattern of blacklist) {
         if (filePath.includes(pattern)) {

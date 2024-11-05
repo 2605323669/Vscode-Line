@@ -74,7 +74,7 @@ function countLinesInDirectory(dirPath) {
             codeLines = lineCount - emptyLines - commentLineCount;
             console.log(`文件: ${dirPath} 总行数: ${lineCount}  空行数: ${emptyLines} 注释行数: ${commentLineCount} 有效代码行数: ${codeLines} `);
             const extension = dirPath.slice(dirPath.lastIndexOf('.') + 1);
-            resolve({ extension, codeLines });
+            resolve({ extension, codeLines });//不能用return 因为fs.readFile是异步操作，用Promise和async来处理
         });
     });
 }
