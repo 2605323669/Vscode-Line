@@ -1,5 +1,6 @@
 const fs = require("fs")
 const commentPatterns = require("./commentPatterns");
+const path = require("path")
 /**
  * 用来统计代码行量
  * @param {*} dirPath 
@@ -17,7 +18,7 @@ function getCommentPatternsByExtension(fileName) {
     return patterns;
 }
 
-function countLinesInDirectory(dirPath, showSummary = false) {
+function countLinesInDirectory(dirPath) {
     return new Promise((resolve, reject) => {
         let emptyLines = 0;
         let codeLines = 0;
@@ -73,10 +74,20 @@ function countLinesInDirectory(dirPath, showSummary = false) {
                 });
             }
             codeLines = lineCount - emptyLines - commentLineCount;
-            if (!showSummary)
-                console.log(`文件: ${dirPath} 总行数: ${lineCount}  空行数: ${emptyLines} 注释行数: ${commentLineCount} 有效代码行数: ${codeLines} `);
+            // console.log('rootDir:', rootDir);
+            // console.log('dirPath:', dirPath);
+            // const relativePath = path.relative(rootDir, dirPath);
+            // if (!showSummary)
+            // console.log(`文件: ${relativePath} 总行数: ${lineCount}  空行数: ${emptyLines} 注释行数: ${commentLineCount} 有效代码行数: ${codeLines} `);
             const extension = dirPath.slice(dirPath.lastIndexOf('.') + 1);
-            resolve({ extension, codeLines });//不能用return 因为fs.readFile是异步操作，用Promise和async来处理
+            resolve({
+                extension,
+                dirPath,
+                lineCount,
+                emptyLines,
+                commentLineCount,
+                codeLines
+            });//不能用return 因为fs.readFile是异步操作，用Promise和async来处理
         });
     });
 }

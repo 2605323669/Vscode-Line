@@ -13,7 +13,8 @@ function isBlackListed(filePath, blacklist) {
     return false;
 }
 
-function findFiles(filePath, promises, showSummary = false) {
+function findFiles(filePath, promises) {
+    // console.log(directory);
     if (fs.existsSync(filePath)) {//判断文件目录是否存在
         if (!isBlackListed(filePath, blacklist)) {
             let stats = fs.statSync(filePath)//获取文件信息
@@ -23,15 +24,15 @@ function findFiles(filePath, promises, showSummary = false) {
                     let currentFilePath = path.join(filePath, files[i])//处理路径拼接
                     stats = fs.statSync(currentFilePath)//获取文件信息
                     if (stats.isDirectory()) {//判断是否为目录
-                        findFiles(currentFilePath, promises, showSummary);
+                        findFiles(currentFilePath, promises);
                     } else {
                         const ext = path.extname(currentFilePath);
                         if (validFileExtensions.includes(ext))
-                            promises.push(countLines.countLinesInDirectory(currentFilePath, showSummary));
+                            promises.push(countLines.countLinesInDirectory(currentFilePath));
                     }
                 }
             } else if (stats.isFile()) {
-                promises.push(countLines.countLinesInDirectory(filePath, showSummary));
+                promises.push(countLines.countLinesInDirectory(filePath));
             }
         }
     } else {
@@ -40,12 +41,48 @@ function findFiles(filePath, promises, showSummary = false) {
 }
 async function calculateTotalLines(directory, showSummary = false) {
     const promises = [];
-    findFiles(directory, promises, showSummary);
+    findFiles(directory, promises);
     const results = await Promise.all(promises);
     const languageCodeLines = {};
     let totalCodeLines = 0;
+    
+    const colWidths = {
+        path: 100,
+        lineCount: 10,
+        emptyLines: 10,
+        commentLines: 12,
+        codeLines: 12
+    };
 
-    results.forEach(({ extension, codeLines }) => {
+    if (!showSummary) {
+        // 定义列宽
+
+
+        // 打印表头
+        console.log("= = = = = = 文件统计信息 = = = = = =");
+        console.log(
+            "文件路径".padEnd(colWidths.path - 20) +
+            "总行数".padEnd(colWidths.lineCount) +
+            "空行数".padEnd(colWidths.emptyLines) +
+            "注释行数".padEnd(colWidths.commentLines) +
+            "有效代码行数".padEnd(colWidths.codeLines)
+        );
+        console.log("-".repeat(colWidths.path + colWidths.lineCount + colWidths.emptyLines + colWidths.commentLines + colWidths.codeLines));
+    }
+
+    // 打印每个文件的统计信息
+    results.forEach(({ extension, codeLines, lineCount, emptyLines, commentLineCount, dirPath }) => {
+        if (!showSummary) {
+            const relativePath = path.relative(directory, dirPath);  // 计算相对路径
+            console.log(
+                relativePath.padEnd(colWidths.path - 14) +
+                String(lineCount).padEnd(colWidths.lineCount + 3) +
+                String(emptyLines).padEnd(colWidths.emptyLines + 3) +
+                String(commentLineCount).padEnd(colWidths.commentLines + 3) +
+                String(codeLines).padEnd(colWidths.codeLines)
+            );
+        }
+
         if (!languageCodeLines[extension]) {
             languageCodeLines[extension] = 0;
         }

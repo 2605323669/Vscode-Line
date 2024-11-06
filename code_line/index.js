@@ -1,8 +1,8 @@
 const readDirectory = require("./readDirectory");
 // 可以通过执行命令传入目录参数  
 const params = process.argv.slice(2);  // 使用 slice 而不是 splice，第二个参数是传入的目录路径
-// const filePath = params[0];
-const filePath = "F:\\毕业设计\\毕业设计\\毕业设计2"
+const filePath = params[0];
+// const filePath = "F:\\毕业设计\\毕业设计\\毕业设计2"
 // "F:\\node_pkg"
 // F:\\毕业设计\\毕业设计\\毕业设计2
 //C:\Users\86158\Desktop\开源软件\Test
