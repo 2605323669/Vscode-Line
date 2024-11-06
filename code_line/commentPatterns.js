@@ -43,6 +43,10 @@ module.exports = {
     },
     vue: {
         singleLine: /^\/\/.*|^<!--.*?-->/,
-        multiLine:/\/\*[\s\S]*?\*\/|<!--[^\n]*\n(?:.*\n)*?[^-]*-->/g
+        multiLine: /\/\*[\s\S]*?\*\/|<!--[^\n]*\n(?:.*\n)*?[^-]*-->/g
+    },
+    ts: {
+        multiLine: /\/\*[\s\S]*?\*\//g,
+        singleLine: /^\/\/.*/
     }
 }

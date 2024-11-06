@@ -17,13 +17,13 @@ function getCommentPatternsByExtension(fileName) {
     return patterns;
 }
 
-function countLinesInDirectory(dirPath) {
+function countLinesInDirectory(dirPath, showSummary = false) {
     return new Promise((resolve, reject) => {
         let emptyLines = 0;
         let codeLines = 0;
         let commentLineCount = 0;//注释行数
         // 读取文件并统计行数  
-        
+
         fs.readFile(dirPath, 'utf8', (err, data) => {
             if (err) {
                 return console.error(`无法读取文件: ${err}`);
@@ -68,11 +68,13 @@ function countLinesInDirectory(dirPath) {
                     //     commentLineCount += comment.split('\n').length;
                     // }
                     // console.log(comment);
+                    // console.log("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
                     commentLineCount += comment.split('\n').length;
                 });
             }
             codeLines = lineCount - emptyLines - commentLineCount;
-            console.log(`文件: ${dirPath} 总行数: ${lineCount}  空行数: ${emptyLines} 注释行数: ${commentLineCount} 有效代码行数: ${codeLines} `);
+            if (!showSummary)
+                console.log(`文件: ${dirPath} 总行数: ${lineCount}  空行数: ${emptyLines} 注释行数: ${commentLineCount} 有效代码行数: ${codeLines} `);
             const extension = dirPath.slice(dirPath.lastIndexOf('.') + 1);
             resolve({ extension, codeLines });//不能用return 因为fs.readFile是异步操作，用Promise和async来处理
         });
