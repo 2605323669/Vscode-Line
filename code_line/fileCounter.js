@@ -23,8 +23,8 @@ function countLinesInDirectory(dirPath) {
         let emptyLines = 0;
         let codeLines = 0;
         let commentLineCount = 0;//注释行数
-        // 读取文件并统计行数  
 
+        // 读取文件并统计行数  
         fs.readFile(dirPath, 'utf8', (err, data) => {
             if (err) {
                 return console.error(`无法读取文件: ${err}`);

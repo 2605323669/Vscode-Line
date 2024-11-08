@@ -1,7 +1,7 @@
 const fs = require("fs")
 const path = require("path")
 const countLines = require("./fileCounter")
-const validFileExtensions = ['.js', '.py', '.java', '.xml', '.html', '.lua', '.cs', '.php', '.css', '.vue', '.ts']
+const validFileExtensions = ['.js', '.py', '.java', '.xml', '.html', '.lua', '.cs', '.php', '.css', '.vue', '.ts', '.go']
 const blacklist = require('./blackList');
 
 function isBlackListed(filePath, blacklist) {
@@ -45,7 +45,8 @@ async function calculateTotalLines(directory, showSummary = false) {
     const results = await Promise.all(promises);
     const languageCodeLines = {};
     let totalCodeLines = 0;
-    
+
+    // 定义列宽
     const colWidths = {
         path: 100,
         lineCount: 10,
@@ -55,9 +56,6 @@ async function calculateTotalLines(directory, showSummary = false) {
     };
 
     if (!showSummary) {
-        // 定义列宽
-
-
         // 打印表头
         console.log("= = = = = = 文件统计信息 = = = = = =");
         console.log(
@@ -92,14 +90,11 @@ async function calculateTotalLines(directory, showSummary = false) {
     console.log("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
     let output = '每种语言的有效代码行数：';
     console.log(output);
-    // console.log("每种语言的有效代码行数：");
     if (languageCodeLines) {
         for (let extension in languageCodeLines) {
             console.log(`${extension}: ${languageCodeLines[extension]} `);
         }
     }
-    // console.log(output);
-    // console.log("每种语言的有效代码行数：", languageCodeLines);
     console.log("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
     console.log(`所有文件的有效代码总行数: ${totalCodeLines}`);
 }

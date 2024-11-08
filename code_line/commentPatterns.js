@@ -1,42 +1,35 @@
 module.exports = {
     js: {
-        // singleLine: /\/\/.*$/gm,
-        multiLine: /\/\*[\s\S]*?\*\//g,
-        singleLine: /^\/\/.*/
+        singleLine: /^\/\/.*/,
+        multiLine: /\/\*[\s\S]*?\*\//g
     },
     java: {
-        // singleLine: /\/\/.*$/gm,
-        multiLine: /\/\*[\s\S]*?\*\//g,
-        singleLine: /^\/\/.*/
+        singleLine: /^\/\/.*/,
+        multiLine: /\/\*[\s\S]*?\*\//g
     },
     py: {
-        // singleLine: /#.*$/gm,
-        multiLine: /(['"]{3})[\s\S]*?\1/g,
-        singleLine: /^#/
+        singleLine: /^#/,
+        multiLine: /(['"]{3})[\s\S]*?\1/g
     },
     xml: {
         singleLine: /^<!--.*?-->/,
-        multiLine: /<!--[^\n]*\n(?:.*\n)*?[^-]*-->/g,//<!-- 这是一个XML文件 -->
+        multiLine: /<!--[^\n]*\n(?:.*\n)*?[^-]*-->/g,
     },
     html: {
-        // singleLine: /\/\/.*$/gm,
-        multiLine: /<!--[\s\S]*?-->|\/\*[\s\S]*?\*\//g,
-        singleLine: /^\/\/.*/
+        singleLine: /^\/\/.*/,
+        multiLine: /<!--[\s\S]*?-->|\/\*[\s\S]*?\*\//g
     },
     lua: {
-        // singleLine: /--.*$/gm,
-        multiLine: /--\[\[[\s\S]*?\]\]/g,
-        singleLine: /^(?<!\[)--(?!\[|\])/
+        singleLine: /^(?<!\[)--(?!\[|\])/,
+        multiLine: /--\[\[[\s\S]*?\]\]/g
     },
     cs: {
-        // singleLine: /\/\/.*$/gm,
-        multiLine: /\/\*[\s\S]*?\*\//g,
-        singleLine: /^\/\/.*/
+        singleLine: /^\/\/.*/,
+        multiLine: /\/\*[\s\S]*?\*\//g
     },
     php: {
-        // singleLine: /\/\/.*$|#.*$/gm,
-        multiLine: /\/\*[\s\S]*?\*\//g,
-        singleLine: /^(?:\/\/|\#).*$/
+        singleLine: /^(?:\/\/|\#).*$/,
+        multiLine: /\/\*[\s\S]*?\*\//g
     },
     css: {
         multiLine: /\/\*[\s\S]*?\*\//g
@@ -46,7 +39,11 @@ module.exports = {
         multiLine: /\/\*[\s\S]*?\*\/|<!--[^\n]*\n(?:.*\n)*?[^-]*-->/g
     },
     ts: {
-        multiLine: /\/\*[\s\S]*?\*\//g,
-        singleLine: /^\/\/.*/
+        singleLine: /^\/\/.*/,
+        multiLine: /\/\*[\s\S]*?\*\//g
+    },
+    go: {
+        singleLine: /^\/\/.*/,
+        multiLine: /\/\*[\s\S]*?\*\//g
     }
 }
