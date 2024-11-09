@@ -94,3 +94,12 @@
 - **路径验证改进**：在进入 calculateTotalLines 函数前增加路径有效性检查，确保提供的 filePath 存在且为有效目录，避免无效路径继续执行。
 
 ---
+
+## 11月9日
+
+- **文件系统操作异常处理**：在 readDirectory.js 中的 findFiles 函数里，为 fs.statSync 和 fs.readdirSync 方法添加 try-catch 结构，以捕获文件读取和目录访问的异常，避免程序因文件系统错误中断。
+- **文件读取错误处理**：在 fileCounter.js 文件的 countLinesInDirectory 函数中，修改 fs.readFile 异常处理方式，若文件读取失败，使用 reject 将错误传递给调用方，以便进一步处理。
+- **注释模式匹配错误处理**：在 getCommentPatternsByExtension 函数中，若无法找到文件类型对应的注释模式，返回 null 并在调用处检查，确保未找到匹配模式时直接终止统计操作并抛出错误提示。
+- **Promise 异常处理**：在 calculateTotalLines 函数中增加 try-catch 或 .catch 异常捕获，确保 Promise.all 处理文件统计时的错误得到正确处理并输出错误信息。
+
+---
