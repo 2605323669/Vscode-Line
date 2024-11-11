@@ -14,5 +14,8 @@
     "codeline"
   ],
   "author": "Sunr\b TAO\b\bao",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "prompt-sync": "^4.2.0"
+  }
 }

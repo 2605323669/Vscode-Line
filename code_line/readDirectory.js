@@ -4,8 +4,8 @@ const countLines = require("./fileCounter")
 const validFileExtensions = ['.js', '.py', '.java', '.xml', '.html', '.lua', '.cs', '.php', '.css', '.vue', '.ts', '.go']
 const blacklist = require('./blackList');
 
-function isBlackListed(filePath, blacklist) {
-    for (let pattern of blacklist) {
+function isBlackListed(filePath, combinedBlacklist) {
+    for (let pattern of combinedBlacklist) {
         if (filePath.includes(pattern)) {
             return true;
         }
@@ -13,10 +13,10 @@ function isBlackListed(filePath, blacklist) {
     return false;
 }
 
-function findFiles(filePath, promises) {
+function findFiles(filePath, promises, combinedBlacklist) {
     try {
         if (fs.existsSync(filePath)) {//判断文件目录是否存在
-            if (!isBlackListed(filePath, blacklist)) {
+            if (!isBlackListed(filePath, combinedBlacklist)) {
                 let stats = fs.statSync(filePath)//获取文件信息
                 if (stats.isDirectory()) {
                     const files = fs.readdirSync(filePath)//返回目录下文件数组列表[ '.git', 'app.js', 'code_line', 'read.js', 'README.md' ]
@@ -24,7 +24,7 @@ function findFiles(filePath, promises) {
                         let currentFilePath = path.join(filePath, files[i])//处理路径拼接
                         stats = fs.statSync(currentFilePath)//获取文件信息
                         if (stats.isDirectory()) {//判断是否为目录
-                            findFiles(currentFilePath, promises);
+                            findFiles(currentFilePath, promises, combinedBlacklist);
                         } else {
                             const ext = path.extname(currentFilePath);
                             if (validFileExtensions.includes(ext))
@@ -42,9 +42,11 @@ function findFiles(filePath, promises) {
         console.error(`文件系统操作出现错误: ${error.message}`);
     }
 }
-async function calculateTotalLines(directory, showSummary = false) {
+async function calculateTotalLines(directory, showSummary = false, userExcludeDirs = []) {
     const promises = [];
-    findFiles(directory, promises);
+    const combinedBlacklist = [...blacklist, ...userExcludeDirs];
+    
+    findFiles(directory, promises, combinedBlacklist);
     try {
         const results = await Promise.all(promises);
         const languageCodeLines = {};
