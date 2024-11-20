@@ -42,7 +42,7 @@ function findFiles(filePath, promises, combinedBlacklist) {
         console.error(`文件系统操作出现错误: ${error.message}`);
     }
 }
-async function calculateTotalLines(directory, showSummary = false, userExcludeDirs = []) {
+async function calculateTotalLines(directory, showSummary = false, userExcludeDirs = [], exportResult = false) {
     const promises = [];
     const combinedBlacklist = [...blacklist, ...userExcludeDirs];
 
@@ -87,11 +87,11 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
         results.forEach(({ extension, codeLines, lineCount, emptyLines, commentLineCount, dirPath }) => {
             if (!showSummary) {
                 const relativePath = path.relative(directory, dirPath);  // 计算相对路径
-                outputText += "|" + relativePath.padEnd(colWidths.path - 14) +
-                    "|" + String(lineCount).padEnd(colWidths.lineCount + 3) +
-                    "|" + String(emptyLines).padEnd(colWidths.emptyLines + 3) +
-                    "|" + String(commentLineCount).padEnd(colWidths.commentLines + 3) +
-                    "|" + String(codeLines).padEnd(colWidths.codeLines) + "\n";
+                outputText += + relativePath.padEnd(colWidths.path - 14) +
+                    + String(lineCount).padEnd(colWidths.lineCount + 3) +
+                    + String(emptyLines).padEnd(colWidths.emptyLines + 3) +
+                    + String(commentLineCount).padEnd(colWidths.commentLines + 3) +
+                    + String(codeLines).padEnd(colWidths.codeLines) + "\n";
                 console.log(
                     relativePath.padEnd(colWidths.path - 14) +
                     String(lineCount).padEnd(colWidths.lineCount + 3) +
@@ -123,14 +123,16 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
         outputText += `所有文件的有效代码总行数: ${totalCodeLines}`
         console.log(`所有文件的有效代码总行数: ${totalCodeLines}`);
         // console.log(outputText);
+        if (exportResult) {
+            fs.writeFile("output.txt", outputText, { encoding: 'utf8' }, (err) => {
+                if (err) {
+                    console.error(`文件写入失败: ${err.message}`);
+                } else {
+                    console.log(`结果已导出到 output.txt`);
+                }
+            });
+        }
 
-        fs.writeFile("output.txt", outputText, { encoding: 'utf8' }, (err) => {
-            if (err) {
-                console.error(`文件写入失败: ${err.message}`);
-            } else {
-                console.log(`结果已导出到 output.txt`);
-            }
-        });
     } catch (error) {
         console.error(`统计文件行数时发生错误: ${error.message}`);
     }
