@@ -59,5 +59,5 @@ do {
         userExcludeDirs.push(input);
     }
 } while (input !== "done");
-// readDirectory.calculateTotalLines(filePath, showSummary, userExcludeDirs);
+
 readDirectory.calculateTotalLines(filePath, showSummary, userExcludeDirs, exportResult);
