@@ -4,6 +4,9 @@ const countLines = require("./fileCounter")
 const validFileExtensions = ['.js', '.py', '.java', '.xml', '.html', '.lua', '.cs', '.php', '.css', '.vue', '.ts', '.go']
 const blacklist = require('./blackList');
 
+/**
+ * 检查文件路径是否在黑名单中
+ */
 function isBlackListed(filePath, combinedBlacklist) {
     for (let pattern of combinedBlacklist) {
         if (filePath.includes(pattern)) {
@@ -13,30 +16,49 @@ function isBlackListed(filePath, combinedBlacklist) {
     return false;
 }
 
+/**
+ * 处理文件逻辑
+ */
+function processFile(filePath, promises) {
+    const ext = path.extname(filePath);
+    if (validFileExtensions.includes(ext))
+        promises.push(countLines.countLinesInDirectory(filePath));
+}
+
+/**
+ * 递归处理文件夹逻辑
+ */
+function processDirectory(filePath, promises, combinedBlacklist) {
+    const files = fs.readdirSync(filePath); // 读取文件夹内容,返回目录下文件数组列表如：[ '.git', 'app.js', 'code_line', 'read.js', 'README.md' ]
+    for (const file of files) {
+        const fullPath = path.join(filePath, file); // 拼接路径
+        const stats = fs.statSync(fullPath); // 获取文件状态
+        if (stats.isDirectory()) {
+            // 如果是文件夹，递归处理
+            findFiles(fullPath, promises, combinedBlacklist);
+        } else if (stats.isFile()) {
+            // 如果是文件，处理文件
+            processFile(fullPath, promises);
+        }
+    }
+}
+
 function findFiles(filePath, promises, combinedBlacklist) {
+    if (!fs.existsSync(filePath)) {
+        console.log("您输入的目录不存在！");
+        return;
+    }
+    // 检查黑名单
+    if (isBlackListed(filePath, combinedBlacklist)) return;
     try {
-        if (fs.existsSync(filePath)) {//判断文件目录是否存在
-            if (!isBlackListed(filePath, combinedBlacklist)) {
-                let stats = fs.statSync(filePath)//获取文件信息
-                if (stats.isDirectory()) {
-                    const files = fs.readdirSync(filePath)//返回目录下文件数组列表[ '.git', 'app.js', 'code_line', 'read.js', 'README.md' ]
-                    for (let i = 0; i < files.length; i++) {
-                        let currentFilePath = path.join(filePath, files[i])//处理路径拼接
-                        stats = fs.statSync(currentFilePath)//获取文件信息
-                        if (stats.isDirectory()) {//判断是否为目录
-                            findFiles(currentFilePath, promises, combinedBlacklist);
-                        } else {
-                            const ext = path.extname(currentFilePath);
-                            if (validFileExtensions.includes(ext))
-                                promises.push(countLines.countLinesInDirectory(currentFilePath));
-                        }
-                    }
-                } else if (stats.isFile()) {
-                    promises.push(countLines.countLinesInDirectory(filePath));
-                }
-            }
-        } else {
-            console.log("您输入的目录不存在！")
+        const stats = fs.statSync(filePath);
+
+        if (stats.isDirectory()) {
+            // 如果是目录，处理目录
+            processDirectory(filePath, promises, blacklist);
+        } else if (stats.isFile()) {
+            // 如果是文件，处理文件
+            processFile(filePath, promises);
         }
     } catch (error) {
         console.error(`文件系统操作出现错误: ${error.message}`);

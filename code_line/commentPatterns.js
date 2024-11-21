@@ -2,7 +2,6 @@ module.exports = {
     js: {
         singleLine: /^\/\/.*$/,
         multiLine: /\/\*[\s\S]*?\*\//g,
-        // regex: /\/\/.*$/gm
     },
     java: {
         singleLine: /^\/\/.*/,
