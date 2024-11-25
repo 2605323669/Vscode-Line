@@ -18,7 +18,7 @@ let input = "";
 
 //验证路径
 try {
-    if (!filePath || !fs.existsSync(filePath) || !fs.statSync(filePath).isDirectory()) {
+    if (!filePath || !fs.existsSync(filePath) || (!fs.statSync(filePath).isDirectory() & !fs.statSync(filePath).isFile())) {
         console.error('没有提供路径或路径不存在！请检查！');
         process.exit(1);  // 如果没有提供目录路径，则退出程序  
     }
@@ -39,12 +39,12 @@ if (params.length > 1) {
         }
     }
 }
-console.log("请输入要排除的目录或文件（输入 'done' 结束）：");
-do {
-    input = promptSync();
-    if (input !== "done") {
-        userExcludeDirs.push(input);
-    }
-} while (input !== "done");
+// console.log("请输入要排除的目录或文件（输入 'done' 结束）：");
+// do {
+//     input = promptSync();
+//     if (input !== "done") {
+//         userExcludeDirs.push(input);
+//     }
+// } while (input !== "done");
 
 readDirectory.calculateTotalLines(filePath, showSummary, userExcludeDirs, exportResult);

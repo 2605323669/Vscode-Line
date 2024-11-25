@@ -64,16 +64,41 @@ function findFiles(filePath, promises, combinedBlacklist) {
         console.error(`文件系统操作出现错误: ${error.message}`);
     }
 }
+
+// 格式化日期为 "yyyy-MM-dd HH:mm:ss"
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
 async function calculateTotalLines(directory, showSummary = false, userExcludeDirs = [], exportResult = false) {
     const promises = [];
     const combinedBlacklist = [...blacklist, ...userExcludeDirs];
 
     findFiles(directory, promises, combinedBlacklist);
+
     try {
         const results = await Promise.all(promises);
         const languageCodeLines = {};
+        const date = new Date();
+        const formattedDate = formatDate(date);
+
+        let totalLineCount = 0;
+        let totalEmptyLines = 0;
+        let totalCommentLineCount = 0;
         let totalCodeLines = 0;
+        let fileCount = 0;
+        let output = "";
         let outputText = "";
+
+        output += "日期 : " + formattedDate + "\n";
+        output += "目录 : " + directory + "\n";
 
         // 定义列宽
         const colWidths = {
@@ -96,6 +121,7 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
         }
 
         // 打印每个文件的统计信息
+        const result = [];
         results.forEach(({ extension, codeLines, lineCount, emptyLines, commentLineCount, dirPath }) => {
             if (!showSummary) {
                 const relativePath = path.relative(directory, dirPath);  // 计算相对路径
@@ -104,6 +130,19 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                     String(emptyLines).padEnd(colWidths.emptyLines + 3) +
                     String(commentLineCount).padEnd(colWidths.commentLines + 3) +
                     String(codeLines).padEnd(colWidths.codeLines) + "\n";
+                totalLineCount += lineCount;
+                totalEmptyLines += emptyLines;
+                totalCommentLineCount += commentLineCount;
+                fileCount += 1;
+                //在这里totalCodeLines应该在这，但是现在短暂放在外面
+                result.push({
+                    dirPath,
+                    extension,
+                    codeLines,
+                    commentLineCount,
+                    emptyLines,
+                    lineCount
+                });
             }
 
             if (!languageCodeLines[extension]) {
@@ -112,17 +151,20 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
             languageCodeLines[extension] += codeLines;
             totalCodeLines += codeLines;
         });
+        // console.log(generateTable(result, directory));
+        output += "总计 : " + fileCount + "个文件，" + totalCodeLines + "行代码，" + totalCommentLineCount + "行注释，" + totalEmptyLines
+            + "个空行，" + "全部共" + totalLineCount + "行。" + "\n" + "\n";
         outputText += "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =\n"
         outputText += "每种语言的有效代码行数\r\n"
         if (languageCodeLines) {
             for (let extension in languageCodeLines) {
-                console.log(`${extension}: ${languageCodeLines[extension]} `);
                 outputText += `${extension}: ${languageCodeLines[extension]} \n`
             }
         }
         outputText += "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =\n"
         outputText += `所有文件的有效代码总行数: ${totalCodeLines}`
-        console.log(outputText);
+        output += outputText;
+        console.log(output);
         if (exportResult) {
             fs.writeFile("output.txt", outputText, { encoding: 'utf8' }, (err) => {
                 if (err) {
