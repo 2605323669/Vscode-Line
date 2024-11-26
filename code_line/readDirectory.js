@@ -77,7 +77,48 @@ function formatDate(date) {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
+/**
+ * 生成表格框架
+ */
+function generateLanguagesTable(results) {
+    const maxLanguageLength = Math.max(...results.map(r => r.language.length), 8);
+    const colWidths = {
+        language: maxLanguageLength + 2, // +2 为了给表格边界留余地
+        files: 12,
+        code: 12,
+        comment: 12,
+        blank: 12,
+        total: 12,
+    };
+    // 2. 表头
+    const header = [
+        //进行了手动调整，后续需要修改！
+        `| ${"语言".padEnd(colWidths.language - 4)} | ${"文件数".padEnd(colWidths.files - 5)} | ${"有效行".padStart(colWidths.code - 5)} | ${"注释行".padStart(colWidths.comment - 5)} | ${"空行".padStart(colWidths.blank - 4)} | ${"总行".padStart(colWidths.total - 4)} |`
+    ];
+    const separator = [
+        `+${"-".repeat(colWidths.language)}+${"-".repeat(colWidths.language)}+${"-".repeat(colWidths.code)}+${"-".repeat(colWidths.comment)}+${"-".repeat(colWidths.blank)}+${"-".repeat(colWidths.total)}+`
+    ];
+    // 3. 内容行
+    const rows = results.map(({ language, files, codeLines, commentLineCount, emptyLines, lineCount }) => {
+        return `| ${language.padEnd(colWidths.language - 2)} | ${String(files).padStart(colWidths.files - 2)} | ${String(codeLines).padStart(colWidths.code - 2)} | ${String(commentLineCount).padStart(colWidths.comment - 2)} | ${String(emptyLines).padStart(colWidths.blank - 2)} | ${String(lineCount).padStart(colWidths.total - 2)} |`;
+    });
+    return [
+        separator[0],
+        header[0],
+        separator[0],
+        ...rows,
+        separator[0],
+    ].join("\n");
+}
+
 async function calculateTotalLines(directory, showSummary = false, userExcludeDirs = [], exportResult = false) {
+    //测试generateLanguagesTable函数
+    // const headers = ['Path', 'Files', 'Code', 'Comment', 'Blank', 'Total'];
+    // const results = [
+    //     { language: "TypeScript", files: 8, codeLines: 5, commentLineCount: 0, emptyLines: 0, lineCount: 5 }, { language: "Go", files: 8, codeLines: 5, commentLineCount: 0, emptyLines: 0, lineCount: 5 }
+    // ];
+    // console.log(generateLanguagesTable(results));
+
     const promises = [];
     const combinedBlacklist = [...blacklist, ...userExcludeDirs];
 
@@ -111,7 +152,7 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
 
         if (!showSummary) {
             // 打印表头
-            outputText += "= = = = = = 文件统计信息 = = = = = =\n";
+            outputText += "\n= = = = = = 文件统计信息 = = = = = =\n";
             outputText += "文件路径".padEnd(colWidths.path - 20) +
                 "总行数".padEnd(colWidths.lineCount) +
                 "空行数".padEnd(colWidths.emptyLines) +
@@ -122,6 +163,8 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
 
         // 打印每个文件的统计信息
         const result = [];
+        let languageStats = {};
+        const finalResults = [];
         results.forEach(({ extension, codeLines, lineCount, emptyLines, commentLineCount, dirPath }) => {
             if (!showSummary) {
                 const relativePath = path.relative(directory, dirPath);  // 计算相对路径
@@ -143,17 +186,59 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                     emptyLines,
                     lineCount
                 });
+                if (!languageCodeLines[extension]) {
+                    languageCodeLines[extension] = 0;
+                }
+                languageCodeLines[extension] += codeLines;
+                totalCodeLines += codeLines;
+                const languageMapping = {
+                    "js": "JavaScript",
+                    "py": "Python",
+                    "java": "Java",
+                    "xml": "XML",      // 注意：XML不是一种编程语言，而是一种标记语言
+                    "html": "HTML",    // HTML同样是一种标记语言
+                    "lua": "Lua",
+                    "cs": "C#",
+                    "php": "PHP",
+                    "css": "CSS",      // CSS是层叠样式表，用于描述HTML或XML文档的外观和格式
+                    "vue": "Vue",
+                    "ts": "TypeScript",
+                    "go": "Go"
+                };
+                const language = languageMapping[extension] || "Unknown";
+                // 更新语言统计信息
+                if (!languageStats[language]) {
+                    languageStats[language] = {
+                        files: 0,
+                        codeLines: 0,
+                        lineCount: 0,
+                        emptyLines: 0,
+                        commentLineCount: 0
+                    };
+                }
+                // console.log(language);
+                languageStats[language].files++;
+                languageStats[language].codeLines += codeLines;
+                languageStats[language].lineCount += lineCount;
+                languageStats[language].emptyLines += emptyLines;
+                languageStats[language].commentLineCount += commentLineCount;
             }
-
-            if (!languageCodeLines[extension]) {
-                languageCodeLines[extension] = 0;
-            }
-            languageCodeLines[extension] += codeLines;
-            totalCodeLines += codeLines;
         });
+        for (const language in languageStats) {
+            if (languageStats.hasOwnProperty(language)) {
+                finalResults.push({
+                    language,
+                    files: languageStats[language].files,
+                    codeLines: languageStats[language].codeLines,
+                    commentLineCount: languageStats[language].commentLineCount,
+                    emptyLines: languageStats[language].emptyLines,
+                    lineCount: languageStats[language].lineCount
+                });
+            }
+        }
         // console.log(generateTable(result, directory));
         output += "总计 : " + fileCount + "个文件，" + totalCodeLines + "行代码，" + totalCommentLineCount + "行注释，" + totalEmptyLines
-            + "个空行，" + "全部共" + totalLineCount + "行。" + "\n" + "\n";
+            + "个空行，" + "全部共" + totalLineCount + "行。";
         outputText += "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =\n"
         outputText += "每种语言的有效代码行数\r\n"
         if (languageCodeLines) {
@@ -163,7 +248,8 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
         }
         outputText += "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =\n"
         outputText += `所有文件的有效代码总行数: ${totalCodeLines}`
-        output += outputText;
+        // output += generateLanguagesTable(finalResults);
+        output += "\n" + outputText;
         console.log(output);
         if (exportResult) {
             fs.writeFile("output.txt", outputText, { encoding: 'utf8' }, (err) => {
