@@ -85,7 +85,7 @@ function formatDate(date) {
 }
 
 /**
- * 生成表格框架
+ * 生成编程语言表格框架
  */
 function generateLanguagesTable(results) {
     const maxLanguageLength = Math.max(...results.map(r => r.language.length), 8);
@@ -97,33 +97,37 @@ function generateLanguagesTable(results) {
         blank: 12,
         total: 12,
     };
+
     // 2. 表头
     const header = [
         //进行了手动调整，后续需要修改！
-        `| ${"语言".padEnd(colWidths.language - 4)} | `
-        + `${"文件数".padEnd(colWidths.files - 5)} | `
-        + `${"有效行".padStart(colWidths.code - 5)} | `
-        + `${"注释行".padStart(colWidths.comment - 5)} | `
-        + `${"空行".padStart(colWidths.blank - 4)} | `
-        + `${"总行".padStart(colWidths.total - 4)} |`
+        `| ${"语言".padEnd(colWidths.language - 2)} | `
+        + `${"文件数".padEnd(colWidths.files - 3)} | `
+        + `${"有效行".padStart(colWidths.code - 3)} | `
+        + `${"注释行".padStart(colWidths.comment - 3)} | `
+        + `${"空行".padStart(colWidths.blank - 2)} | `
+        + `${"总行".padStart(colWidths.total - 2)} |`
     ];
+
     const separator = [
-        `+${"-".repeat(colWidths.language)}`
-        + `+${"-".repeat(colWidths.language)}`
-        + `+${"-".repeat(colWidths.code)}`
-        + `+${"-".repeat(colWidths.comment)}`
-        + `+${"-".repeat(colWidths.blank)}`
-        + `+${"-".repeat(colWidths.total)}+`
+        `+${"-".repeat(colWidths.language + 2)}`
+        + `+${"-".repeat(colWidths.language + 2)}`
+        + `+${"-".repeat(colWidths.code + 2)}`
+        + `+${"-".repeat(colWidths.comment + 2)}`
+        + `+${"-".repeat(colWidths.blank + 2)}`
+        + `+${"-".repeat(colWidths.total + 2)}+`
     ];
+
     // 3. 内容行
     const rows = results.map(({ language, files, codeLines, commentLineCount, emptyLines, lineCount }) => {
-        return `| ${language.padEnd(colWidths.language - 2)} | `
-            + `${String(files).padStart(colWidths.files - 2)} | `
-            + `${String(codeLines).padStart(colWidths.code - 2)} | `
-            + `${String(commentLineCount).padStart(colWidths.comment - 2)} | `
-            + `${String(emptyLines).padStart(colWidths.blank - 2)} | `
-            + `${String(lineCount).padStart(colWidths.total - 2)} |`;
+        return `| ${language.padEnd(colWidths.language)} | `
+            + `${String(files).padStart(colWidths.files)} | `
+            + `${String(codeLines).padStart(colWidths.code)} | `
+            + `${String(commentLineCount).padStart(colWidths.comment)} | `
+            + `${String(emptyLines).padStart(colWidths.blank)} | `
+            + `${String(lineCount).padStart(colWidths.total)} |`;
     });
+
     return [
         separator[0],
         header[0],
@@ -133,13 +137,117 @@ function generateLanguagesTable(results) {
     ].join("\n");
 }
 
+/**
+ * 生成文件信息表格框架
+ */
+function generateFilesTable(results, directory) {
+    // 1. 动态计算 filename 列宽
+    const maxFilenameLength = Math.max(...results.map(r => path.relative(directory, r.dirPath).length), 8); // 最小宽度为 "filename".length
+    const colWidths = {
+        filename: maxFilenameLength + 2, // +2 为了给表格边界留余地
+        language: 12,
+        code: 12,
+        comment: 12,
+        blank: 12,
+        total: 12,
+    };
+
+    // 2. 表头
+    const header = [
+        //进行了手动调整，后续需要修改！
+        `| ${"文件路径".padEnd(colWidths.filename - 4)} | `
+        + `${"语言".padEnd(colWidths.language - 2)} | `
+        + `${"有效行".padStart(colWidths.code - 3)} | `
+        + `${"注释行".padStart(colWidths.comment - 3)} | `
+        + `${"空行".padStart(colWidths.blank - 2)} | `
+        + `${"总行".padStart(colWidths.total - 2)} |`
+    ];
+    const separator = [
+        `+${"-".repeat(colWidths.filename + 2)}+`
+        + `${"-".repeat(colWidths.language + 2)}+`
+        + `${"-".repeat(colWidths.code + 2)}+`
+        + `${"-".repeat(colWidths.comment + 2)}+`
+        + `${"-".repeat(colWidths.blank + 2)}+`
+        + `${"-".repeat(colWidths.total + 2)}+`
+    ];
+
+    // 3. 内容行
+    const rows = results.map(({ dirPath, extension, codeLines, commentLineCount, emptyLines, lineCount }) => {
+        const relativePath = path.relative(directory, dirPath);
+        return `| ${relativePath.padEnd(colWidths.filename)} | `
+            + `${extension.padEnd(colWidths.language)} | `
+            + `${String(codeLines).padStart(colWidths.code)} | `
+            + `${String(commentLineCount).padStart(colWidths.comment)} | `
+            + `${String(emptyLines).padStart(colWidths.blank)} | `
+            + `${String(lineCount).padStart(colWidths.total)} |`;
+    });
+
+    // 4. 总计行
+    const total = results.reduce(
+        (acc, { codeLines, commentLineCount, emptyLines, lineCount }) => {
+            acc.code += codeLines;
+            acc.comment += commentLineCount;
+            acc.blank += emptyLines;
+            acc.total += lineCount;
+            return acc;
+        },
+        { code: 0, comment: 0, blank: 0, total: 0 }
+    );
+
+    const totalRow = `| ${"总数".padEnd(colWidths.filename - 2)} | `
+        + `${"".padEnd(colWidths.language)} | `
+        + `${String(total.code).padStart(colWidths.code)} | `
+        + `${String(total.comment).padStart(colWidths.comment)} | `
+        + `${String(total.blank).padStart(colWidths.blank)} | `
+        + `${String(total.total).padStart(colWidths.total)} |`;
+
+    // 5. 拼接表格
+    return [
+        separator[0],
+        header[0],
+        separator[0],
+        ...rows,
+        separator[0],
+        totalRow,
+        separator[0],
+    ].join("\n");
+}
+
 async function calculateTotalLines(directory, showSummary = false, userExcludeDirs = [], exportResult = false) {
     //测试generateLanguagesTable函数
     // const headers = ['Path', 'Files', 'Code', 'Comment', 'Blank', 'Total'];
     // const results = [
-    //     { language: "TypeScript", files: 8, codeLines: 5, commentLineCount: 0, emptyLines: 0, lineCount: 5 }, { language: "Go", files: 8, codeLines: 5, commentLineCount: 0, emptyLines: 0, lineCount: 5 }
+    //     { language: "TypeScript", files: 8, codeLines: 5, commentLineCount: 0, emptyLines: 0, lineCount: 5 },
+    // { language: "Go", files: 8, codeLines: 5, commentLineCount: 0, emptyLines: 0, lineCount: 5 }
     // ];
     // console.log(generateLanguagesTable(results));
+    const mockResults = [
+        {
+            dirPath: path.join(__dirname, 'src', 'file1.js'),
+            extension: 'js',
+            codeLines: 50,
+            commentLineCount: 10,
+            emptyLines: 5,
+            lineCount: 65,
+        },
+        {
+            dirPath: path.join(__dirname, 'src', 'file2.ts'),
+            extension: 'ts',
+            codeLines: 70,
+            commentLineCount: 20,
+            emptyLines: 10,
+            lineCount: 100,
+        },
+        {
+            dirPath: path.join(__dirname, 'src', 'file3.py'),
+            extension: 'py',
+            codeLines: 30,
+            commentLineCount: 5,
+            emptyLines: 3,
+            lineCount: 38,
+        },
+    ];
+    console.log(generateFilesTable(mockResults, directory));
 
     const promises = [];
     const combinedBlacklist = [...blacklist, ...userExcludeDirs];
@@ -260,22 +368,12 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                 });
             }
         }
-        // console.log(generateTable(result, directory));
         output += "总计 : " + fileCount + "个文件，" + totalCodeLines + "行代码，" + totalCommentLineCount + "行注释，" + totalEmptyLines
             + "个空行，" + "全部共" + totalLineCount + "行。\n\n";
-        // outputText += "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =\n"
-        // outputText += "每种语言的有效代码行数\r\n"
-        // if (languageCodeLines) {
-        //     for (let extension in languageCodeLines) {
-        //         outputText += `${extension}: ${languageCodeLines[extension]} \n`
-        //     }
-        // }
-        // outputText += "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =\n"
-        // outputText += `所有文件的有效代码总行数: ${totalCodeLines}`
         output += "= = = = = = 编程语言 = = = = = =\n";
         output += generateLanguagesTable(finalResults);
         output += "\n" + outputText;
-        console.log(output);
+        // console.log(output);
         if (exportResult) {
             fs.writeFile("output.txt", output, { encoding: 'utf8' }, (err) => {
                 if (err) {
