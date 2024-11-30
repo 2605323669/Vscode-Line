@@ -43,14 +43,20 @@ function countLinesInDirectory(dirPath) {
                         }
                     }
                 });
-
+                // /<!--[^]*?\n[^]*?-->/g,
+                // /<!--[^]*?\n[^]*?-->/g
                 //多行注释行数统计
                 if (patterns.multiLine) {
                     // const cleanedCode = data.replace(patterns.regex, ''); 
                     // console.log(cleanedCode);
-                    const multiLineComments = data.match(patterns.multiLine) || [];
+                    const allComments = data.match(patterns.multiLine) || [];
+                    // console.log(multiLineComments);
+                    let a = 0;
                     multiLineComments.forEach(comment => {
+                        // console.log(comment);
                         commentLineCount += comment.split('\n').length;
+                        // console.log(a + "          " + comment + "          " + commentLineCount);
+                        //  a++;
                     });
                 }
                 codeLines = lineCount - emptyLines - commentLineCount;

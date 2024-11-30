@@ -169,7 +169,7 @@ function generateFilesTable(results, directory) {
         + `${"-".repeat(colWidths.comment + 2)}+`
         + `${"-".repeat(colWidths.blank + 2)}+`
         + `${"-".repeat(colWidths.total + 2)}+`
-    ];
+    ]; 9
 
     // 3. 内容行
     const rows = results.map(({ dirPath, extension, codeLines, commentLineCount, emptyLines, lineCount }) => {
@@ -214,41 +214,6 @@ function generateFilesTable(results, directory) {
 }
 
 async function calculateTotalLines(directory, showSummary = false, userExcludeDirs = [], exportResult = false) {
-    //测试generateLanguagesTable函数
-    // const headers = ['Path', 'Files', 'Code', 'Comment', 'Blank', 'Total'];
-    // const results = [
-    //     { language: "TypeScript", files: 8, codeLines: 5, commentLineCount: 0, emptyLines: 0, lineCount: 5 },
-    // { language: "Go", files: 8, codeLines: 5, commentLineCount: 0, emptyLines: 0, lineCount: 5 }
-    // ];
-    // console.log(generateLanguagesTable(results));
-    const mockResults = [
-        {
-            dirPath: path.join(__dirname, 'src', 'file1.js'),
-            extension: 'js',
-            codeLines: 50,
-            commentLineCount: 10,
-            emptyLines: 5,
-            lineCount: 65,
-        },
-        {
-            dirPath: path.join(__dirname, 'src', 'file2.ts'),
-            extension: 'ts',
-            codeLines: 70,
-            commentLineCount: 20,
-            emptyLines: 10,
-            lineCount: 100,
-        },
-        {
-            dirPath: path.join(__dirname, 'src', 'file3.py'),
-            extension: 'py',
-            codeLines: 30,
-            commentLineCount: 5,
-            emptyLines: 3,
-            lineCount: 38,
-        },
-    ];
-    console.log(generateFilesTable(mockResults, directory));
-
     const promises = [];
     const combinedBlacklist = [...blacklist, ...userExcludeDirs];
 
@@ -280,17 +245,17 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
             codeLines: 12
         };
 
-        if (!showSummary) {
-            // 打印表头
-            outputText += "\n= = = = = = 文件统计信息 = = = = = =\n";
-            outputText += "-".repeat(colWidths.path + colWidths.lineCount + colWidths.emptyLines + colWidths.commentLines + colWidths.codeLines) + "\n";
-            outputText += "文件路径".padEnd(colWidths.path - 20) +
-                "总行数".padEnd(colWidths.lineCount) +
-                "空行数".padEnd(colWidths.emptyLines) +
-                "注释行数".padEnd(colWidths.commentLines) +
-                "有效代码行数".padEnd(colWidths.codeLines) + "\n";
-            outputText += "-".repeat(colWidths.path + colWidths.lineCount + colWidths.emptyLines + colWidths.commentLines + colWidths.codeLines) + "\n";
-        }
+        // if (!showSummary) {
+        //     // 打印表头
+        //     outputText += "\n= = = = = = 文件统计信息 = = = = = =\n";
+        //     outputText += "-".repeat(colWidths.path + colWidths.lineCount + colWidths.emptyLines + colWidths.commentLines + colWidths.codeLines) + "\n";
+        //     outputText += "文件路径".padEnd(colWidths.path - 20) +
+        //         "总行数".padEnd(colWidths.lineCount) +
+        //         "空行数".padEnd(colWidths.emptyLines) +
+        //         "注释行数".padEnd(colWidths.commentLines) +
+        //         "有效代码行数".padEnd(colWidths.codeLines) + "\n";
+        //     outputText += "-".repeat(colWidths.path + colWidths.lineCount + colWidths.emptyLines + colWidths.commentLines + colWidths.codeLines) + "\n";
+        // }
 
         // 打印每个文件的统计信息
         const result = [];
@@ -298,25 +263,25 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
         const finalResults = [];
         results.forEach(({ extension, codeLines, lineCount, emptyLines, commentLineCount, dirPath }) => {
             if (!showSummary) {
-                const relativePath = path.relative(directory, dirPath);  // 计算相对路径
-                outputText += relativePath.padEnd(colWidths.path - 14) +
-                    String(lineCount).padEnd(colWidths.lineCount + 3) +
-                    String(emptyLines).padEnd(colWidths.emptyLines + 3) +
-                    String(commentLineCount).padEnd(colWidths.commentLines + 3) +
-                    String(codeLines).padEnd(colWidths.codeLines) + "\n";
+                // const relativePath = path.relative(directory, dirPath);  // 计算相对路径
+                // outputText += relativePath.padEnd(colWidths.path - 14) +
+                //     String(lineCount).padEnd(colWidths.lineCount + 3) +
+                //     String(emptyLines).padEnd(colWidths.emptyLines + 3) +
+                //     String(commentLineCount).padEnd(colWidths.commentLines + 3) +
+                //     String(codeLines).padEnd(colWidths.codeLines) + "\n";
                 totalLineCount += lineCount;
                 totalEmptyLines += emptyLines;
                 totalCommentLineCount += commentLineCount;
                 fileCount += 1;
-                //在这里totalCodeLines应该在这，但是现在短暂放在外面
-                result.push({
-                    dirPath,
-                    extension,
-                    codeLines,
-                    commentLineCount,
-                    emptyLines,
-                    lineCount
-                });
+                // //在这里totalCodeLines应该在这，但是现在短暂放在外面
+                // result.push({
+                //     dirPath,
+                //     extension,
+                //     codeLines,
+                //     commentLineCount,
+                //     emptyLines,
+                //     lineCount
+                // });
                 // if (!languageCodeLines[extension]) {
                 //     languageCodeLines[extension] = 0;
                 // }
@@ -337,6 +302,35 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                     "go": "Go"
                 };
                 const language = languageMapping[extension] || "Unknown";
+                //在这里totalCodeLines应该在这，但是现在短暂放在外面
+                extension = language;
+                result.push({
+                    dirPath,
+                    extension,
+                    codeLines,
+                    commentLineCount,
+                    emptyLines,
+                    lineCount
+                });
+
+
+                // // 添加列标题
+                // let csvContent = 'dirPath,codeLines\n';
+
+                // // 提取 dirPath 和 codeLines 并拼接成 CSV 格式
+                // csvContent += result.map(item => `${item.dirPath},${item.codeLines}`).join('\n');
+
+                // // 指定导出文件路径
+                // const outputPath = path.join(__dirname, 'codeLines_with_dirPath.csv');
+
+                // // 将数据写入 CSV 文件
+                // fs.writeFileSync(outputPath, csvContent);
+
+                // console.log(`CSV 文件已成功生成: ${outputPath}`);
+
+
+
+
                 // 更新语言统计信息
                 if (!languageStats[language]) {
                     languageStats[language] = {
@@ -355,7 +349,12 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                 languageStats[language].commentLineCount += commentLineCount;
             }
         });
-        outputText += "-".repeat(colWidths.path + colWidths.lineCount + colWidths.emptyLines + colWidths.commentLines + colWidths.codeLines) + "\n";
+        if (!showSummary) {
+            // 打印表头
+            outputText += "\n= = = = = = 文件统计信息 = = = = = =\n";
+            outputText += generateFilesTable(result, directory);
+        }
+        // outputText += "-".repeat(colWidths.path + colWidths.lineCount + colWidths.emptyLines + colWidths.commentLines + colWidths.codeLines) + "\n";
         for (const language in languageStats) {
             if (languageStats.hasOwnProperty(language)) {
                 finalResults.push({
@@ -373,7 +372,7 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
         output += "= = = = = = 编程语言 = = = = = =\n";
         output += generateLanguagesTable(finalResults);
         output += "\n" + outputText;
-        // console.log(output);
+        console.log(output);
         if (exportResult) {
             fs.writeFile("output.txt", output, { encoding: 'utf8' }, (err) => {
                 if (err) {

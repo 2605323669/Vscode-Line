@@ -1,7 +1,7 @@
 module.exports = {
     js: {
         singleLine: /^\/\/.*$/,
-        multiLine: /\/\*[\s\S]*?\*\//g,
+        multiLine: /\/\*[\s\S]*?\*\//g
     },
     java: {
         singleLine: /^\/\/.*/,
@@ -13,7 +13,7 @@ module.exports = {
     },
     xml: {
         singleLine: /^<!--.*?-->/,
-        multiLine: /<!--[^\n]*\n(?:.*\n)*?[^-]*-->/g,
+        multiLine:  /<!--([\s\S]*?)-->/g
     },
     html: {
         singleLine: /^\/\/.*/,
