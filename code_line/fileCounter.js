@@ -29,34 +29,45 @@ function countLinesInDirectory(dirPath) {
                 return reject(new Error(`无法读取文件: ${err.message}`));
             }
             try {
+                // let a = 0;
                 const lineCount = data.split('\n').length;
+
                 const lines = data.split('\n');
                 const patterns = getCommentPatternsByExtension(dirPath);
                 lines.forEach(line => {
                     //trim()方法将空白字符转换为空字符串
-                    if (line.trim() === '') emptyLines++;
+                    if (line.trim() === '') {
+                        emptyLines++;
+                    }
                     else {
                         if (patterns.singleLine) {
                             if (line.trim().match(patterns.singleLine)) {
+                                // console.log(line.trim().match(patterns.singleLine));
                                 commentLineCount++;
                             }
                         }
                     }
                 });
-                // /<!--[^]*?\n[^]*?-->/g,
-                // /<!--[^]*?\n[^]*?-->/g
                 //多行注释行数统计
                 if (patterns.multiLine) {
                     // const cleanedCode = data.replace(patterns.regex, ''); 
                     // console.log(cleanedCode);
-                    const allComments = data.match(patterns.multiLine) || [];
+
+                    let multiLineComments;
+                    if (patterns.xml) {
+                        let allComments = data.match(patterns.multiLine) || [];
+                        multiLineComments = allComments.filter(comment => comment.includes("\n")); // 筛选出多行注释
+                    } else {
+                        multiLineComments = data.match(patterns.multiLine) || [];
+                    }
+                    // let a = 0;
+                    // const multiLineComments = allComments.filter(comment => comment.includes("\n")); // 筛选出多行注释
                     // console.log(multiLineComments);
-                    let a = 0;
                     multiLineComments.forEach(comment => {
                         // console.log(comment);
+                        const nonEmptyLines = comment.split('\n').filter(line => line.trim() !== '').length;//解决多行注释中有单行注释的问题。
                         commentLineCount += comment.split('\n').length;
-                        // console.log(a + "          " + comment + "          " + commentLineCount);
-                        //  a++;
+                        emptyLines -= comment.split('\n').length - nonEmptyLines;
                     });
                 }
                 codeLines = lineCount - emptyLines - commentLineCount;

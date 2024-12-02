@@ -326,7 +326,7 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                 // // 将数据写入 CSV 文件
                 // fs.writeFileSync(outputPath, csvContent);
 
-                // console.log(`CSV 文件已成功生成: ${outputPath}`);
+                // // console.log(`CSV 文件已成功生成: ${outputPath}`);
 
 
 

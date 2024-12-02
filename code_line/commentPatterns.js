@@ -13,7 +13,8 @@ module.exports = {
     },
     xml: {
         singleLine: /^<!--.*?-->/,
-        multiLine:  /<!--([\s\S]*?)-->/g
+        multiLine: /<!--[\s\S]*?-->/g,
+        xml: "xml"
     },
     html: {
         singleLine: /^\/\/.*/,
