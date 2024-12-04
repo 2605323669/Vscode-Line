@@ -22,6 +22,7 @@ function countLinesInDirectory(dirPath) {
         let emptyLines = 0;
         let codeLines = 0;
         let commentLineCount = 0;//注释行数
+        let inBlockComment = null; // 用于存储当前块注释的结束标记
 
         // 读取文件并统计行数  
         fs.readFile(dirPath, 'utf8', (err, data) => {
@@ -29,49 +30,83 @@ function countLinesInDirectory(dirPath) {
                 return reject(new Error(`无法读取文件: ${err.message}`));
             }
             try {
-                // let a = 0;
-                const lineCount = data.split('\n').length;
-
+                const languageConfig = getCommentPatternsByExtension(dirPath);
+                const lineComments = languageConfig.lineComments || [];
+                const blockComments = languageConfig.blockComments || [];
                 const lines = data.split('\n');
-                const patterns = getCommentPatternsByExtension(dirPath);
-                lines.forEach(line => {
-                    //trim()方法将空白字符转换为空字符串
-                    if (line.trim() === '') {
-                        emptyLines++;
+
+                for (let line of lines) {
+                    line = line.trim();
+
+                    // 跳过空行
+                    if (line === '') {
+                        if (!inBlockComment) {
+                            emptyLines++;
+                        } else {
+                            commentLineCount++;
+                        }
+                        continue;
                     }
-                    else {
-                        if (patterns.singleLine) {
-                            if (line.trim().match(patterns.singleLine)) {
-                                // console.log(line.trim().match(patterns.singleLine));
+
+                    // 如果在多行注释内
+                    if (inBlockComment) {
+                        commentLineCount++;
+                        //  console.log(a);
+                        if (line.includes(inBlockComment)) {
+                            // 如果找到了结束标记，退出块注释
+                            inBlockComment = null;
+
+                        }
+                        continue;
+                    }
+
+                    let isHandled = false; // 标记是否已处理当前行
+                    // 检查多行注释的开始标记
+                    if (blockComments.length > 0) {
+                        for (const [start, end] of blockComments) {
+                            const blockStartIndex = line.indexOf(start);
+                            const blockEndIndex = line.indexOf(end);
+
+                            if (blockStartIndex !== -1) {
                                 commentLineCount++;
+                                // console.log(a + " " + blockStartIndex + " " + blockEndIndex);
+                                // 如果块注释起始标记在代码部分之后
+
+                                if (blockStartIndex > 0) {
+                                    commentLineCount--;
+                                    codeLines++; // 代码部分
+                                    // console.log(a);
+                                    inBlockComment = end; // 进入块注释模式
+
+                                }
+                                else {
+                                    // 如果整行是块注释
+                                    inBlockComment = end;
+                                }
+
+                                // 如果块注释起始标记和结束标记在同一行
+                                if (blockEndIndex > blockStartIndex) {
+                                    inBlockComment = null; // 结束块注释
+
+                                }
+                                isHandled = true; // 当前行已处理
+                                break;
                             }
                         }
                     }
-                });
-                //多行注释行数统计
-                if (patterns.multiLine) {
-                    // const cleanedCode = data.replace(patterns.regex, ''); 
-                    // console.log(cleanedCode);
-
-                    let multiLineComments;
-                    if (patterns.xml) {
-                        let allComments = data.match(patterns.multiLine) || [];
-                        multiLineComments = allComments.filter(comment => comment.includes("\n")); // 筛选出多行注释
-                    } else {
-                        multiLineComments = data.match(patterns.multiLine) || [];
+                    // 检查是否为单行注释
+                    if (!isHandled && lineComments.some(comment => line.startsWith(comment))) {
+                        commentLineCount++;
+                        isHandled = true;
                     }
-                    // let a = 0;
-                    // const multiLineComments = allComments.filter(comment => comment.includes("\n")); // 筛选出多行注释
-                    // console.log(multiLineComments);
-                    multiLineComments.forEach(comment => {
-                        // console.log(comment);
-                        const nonEmptyLines = comment.split('\n').filter(line => line.trim() !== '').length;//解决多行注释中有单行注释的问题。
-                        commentLineCount += comment.split('\n').length;
-                        emptyLines -= comment.split('\n').length - nonEmptyLines;
-                    });
+                    // 如果既不是注释也不是空行，则为代码行
+                    if (!isHandled) {
+                        // console.log(a);
+                        codeLines++;
+                    }
                 }
-                codeLines = lineCount - emptyLines - commentLineCount;
                 const extension = dirPath.slice(dirPath.lastIndexOf('.') + 1);
+                let lineCount = emptyLines + commentLineCount + codeLines;
                 resolve({
                     extension,
                     dirPath,
@@ -80,6 +115,59 @@ function countLinesInDirectory(dirPath) {
                     commentLineCount,
                     codeLines
                 });//不能用return 因为fs.readFile是异步操作，用Promise和async来处理
+
+
+                // // let a = 0;
+                // const lineCount = data.split('\n').length;
+
+                // const lines = data.split('\n');
+                // const patterns = getCommentPatternsByExtension(dirPath);
+                // lines.forEach(line => {
+                //     //trim()方法将空白字符转换为空字符串
+                //     if (line.trim() === '') {
+                //         emptyLines++;
+                //     }
+                //     else {
+                //         if (patterns.singleLine) {
+                //             if (line.trim().match(patterns.singleLine)) {
+                //                 // console.log(line.trim().match(patterns.singleLine));
+                //                 commentLineCount++;
+                //             }
+                //         }
+                //     }
+                // });
+                // //多行注释行数统计
+                // if (patterns.multiLine) {
+                //     // const cleanedCode = data.replace(patterns.regex, ''); 
+                //     // console.log(cleanedCode);
+
+                //     let multiLineComments;
+                //     if (patterns.xml) {
+                //         let allComments = data.match(patterns.multiLine) || [];
+                //         multiLineComments = allComments.filter(comment => comment.includes("\n")); // 筛选出多行注释
+                //     } else {
+                //         multiLineComments = data.match(patterns.multiLine) || [];
+                //     }
+                //     // let a = 0;
+                //     // const multiLineComments = allComments.filter(comment => comment.includes("\n")); // 筛选出多行注释
+                //     // console.log(multiLineComments);
+                //     multiLineComments.forEach(comment => {
+                //         // console.log(comment);
+                //         const nonEmptyLines = comment.split('\n').filter(line => line.trim() !== '').length;//解决多行注释中有单行注释的问题。
+                //         commentLineCount += comment.split('\n').length;
+                //         emptyLines -= comment.split('\n').length - nonEmptyLines;
+                //     });
+                // }
+                // codeLines = lineCount - emptyLines - commentLineCount;
+                // const extension = dirPath.slice(dirPath.lastIndexOf('.') + 1);
+                // resolve({
+                //     extension,
+                //     dirPath,
+                //     lineCount,
+                //     emptyLines,
+                //     commentLineCount,
+                //     codeLines
+                // });//不能用return 因为fs.readFile是异步操作，用Promise和async来处理
             } catch (error) {
                 reject(new Error(`在处理文件 ${dirPath} 时发生错误: ${err.message}`));
             }

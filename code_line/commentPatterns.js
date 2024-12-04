@@ -1,50 +1,96 @@
 module.exports = {
+    // js: {
+    //     singleLine: /^\/\/.*$/,
+    //     multiLine: /\/\*[\s\S]*?\*\//g
+    // },
+    // java: {
+    //     singleLine: /^\/\/.*/,
+    //     multiLine: /\/\*[\s\S]*?\*\//g
+    // },
+    // py: {
+    //     singleLine: /^#/,
+    //     multiLine: /(['"]{3})[\s\S]*?\1/g
+    // },
+    // xml: {
+    //     singleLine: /^<!--.*?-->/,
+    //     multiLine: /<!--[\s\S]*?-->/g,
+    //     xml: "xml"
+    // },
+    // html: {
+    //     singleLine: /^\/\/.*/,
+    //     multiLine: /<!--[\s\S]*?-->|\/\*[\s\S]*?\*\//g
+    // },
+    // lua: {
+    //     singleLine: /^(?<!\[)--(?!\[|\])/,
+    //     multiLine: /--\[\[[\s\S]*?\]\]/g
+    // },
+    // cs: {
+    //     singleLine: /^\/\/.*/,
+    //     multiLine: /\/\*[\s\S]*?\*\//g
+    // },
+    // php: {
+    //     singleLine: /^(?:\/\/|\#).*$/,
+    //     multiLine: /\/\*[\s\S]*?\*\//g
+    // },
+    // css: {
+    //     multiLine: /\/\*[\s\S]*?\*\//g
+    // },
+    // vue: {
+    //     singleLine: /^\/\/.*|^<!--.*?-->/,
+    //     multiLine: /\/\*[\s\S]*?\*\/|<!--[^\n]*\n(?:.*\n)*?[^-]*-->/g
+    // },
+    // ts: {
+    //     singleLine: /^\/\/.*/,
+    //     multiLine: /\/\*[\s\S]*?\*\//g
+    // },
+    // go: {
+    //     singleLine: /^\/\/.*/,
+    //     multiLine: /\/\*[\s\S]*?\*\//g
+    // }
     js: {
-        singleLine: /^\/\/.*$/,
-        multiLine: /\/\*[\s\S]*?\*\//g
-    },
-    java: {
-        singleLine: /^\/\/.*/,
-        multiLine: /\/\*[\s\S]*?\*\//g
+        lineComments: ['//'], // 单行注释
+        blockComments: [['/*', '*/']], // 多行注释  未解决问题：如果*/ 和/*在同一行
     },
     py: {
-        singleLine: /^#/,
-        multiLine: /(['"]{3})[\s\S]*?\1/g
+        lineComments: ['#'], // 单行注释
+        blockComments: [['\'\'\'', '\'\'\''], ['"""', '"""']], // 多行注释
+    },
+    java: {
+        lineComments: ['//'], // 单行注释
+        blockComments: [['/*', '*/']], // 多行注释
     },
     xml: {
-        singleLine: /^<!--.*?-->/,
-        multiLine: /<!--[\s\S]*?-->/g,
-        xml: "xml"
+        blockComments: [['<!--', '-->']], // 块注释
     },
     html: {
-        singleLine: /^\/\/.*/,
-        multiLine: /<!--[\s\S]*?-->|\/\*[\s\S]*?\*\//g
+        lineComments: ['//'], // 单行注释
+        blockComments: [['<!--', '-->'], ['/*', '*/']], // 块注释
     },
     lua: {
-        singleLine: /^(?<!\[)--(?!\[|\])/,
-        multiLine: /--\[\[[\s\S]*?\]\]/g
+        lineComments: ['--'], // 单行注释
+        blockComments: [['--[[', ']]']], // 多行注释
     },
     cs: {
-        singleLine: /^\/\/.*/,
-        multiLine: /\/\*[\s\S]*?\*\//g
+        lineComments: ['//'], // 单行注释
+        blockComments: [['/*', '*/']], // 多行注释
     },
     php: {
-        singleLine: /^(?:\/\/|\#).*$/,
-        multiLine: /\/\*[\s\S]*?\*\//g
+        lineComments: ['//', '#'], // 单行注释
+        blockComments: [['/*', '*/']], // 多行注释
     },
     css: {
-        multiLine: /\/\*[\s\S]*?\*\//g
+        blockComments: [['/*', '*/']], // 多行注释
     },
     vue: {
-        singleLine: /^\/\/.*|^<!--.*?-->/,
-        multiLine: /\/\*[\s\S]*?\*\/|<!--[^\n]*\n(?:.*\n)*?[^-]*-->/g
+        lineComments: ['//'], // 单行注释
+        blockComments: [['/*', '*/'], ['<!--', '-->']], // 多行注释和模板注释
     },
     ts: {
-        singleLine: /^\/\/.*/,
-        multiLine: /\/\*[\s\S]*?\*\//g
+        lineComments: ['//'], // 单行注释
+        blockComments: [['/*', '*/']], // 多行注释
     },
     go: {
-        singleLine: /^\/\/.*/,
-        multiLine: /\/\*[\s\S]*?\*\//g
-    }
+        lineComments: ['//'], // 单行注释
+        blockComments: [['/*', '*/']], // 多行注释
+    },
 }
