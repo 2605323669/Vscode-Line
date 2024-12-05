@@ -38,7 +38,6 @@ function countLinesInDirectory(dirPath) {
                 for (let line of lines) {
                     line = line.trim();
 
-                    // 跳过空行
                     if (line === '') {
                         if (!inBlockComment) {
                             emptyLines++;
@@ -51,36 +50,26 @@ function countLinesInDirectory(dirPath) {
                     // 如果在多行注释内
                     if (inBlockComment) {
                         commentLineCount++;
-                        //  console.log(a);
-                        if (line.includes(inBlockComment)) {
-                            // 如果找到了结束标记，退出块注释
-                            inBlockComment = null;
 
+                        if (line.includes(inBlockComment)) {
+                            inBlockComment = null;
                         }
                         continue;
                     }
-
-                    let isHandled = false; // 标记是否已处理当前行
-                    // 检查多行注释的开始标记
+                    let isHandled = false; 
                     if (blockComments.length > 0) {
                         for (const [start, end] of blockComments) {
                             const blockStartIndex = line.indexOf(start);
                             const blockEndIndex = line.indexOf(end);
-
                             if (blockStartIndex !== -1) {
                                 commentLineCount++;
-                                // console.log(a + " " + blockStartIndex + " " + blockEndIndex);
-                                // 如果块注释起始标记在代码部分之后
-
                                 if (blockStartIndex > 0) {
                                     commentLineCount--;
                                     codeLines++; // 代码部分
-                                    // console.log(a);
                                     inBlockComment = end; // 进入块注释模式
 
                                 }
                                 else {
-                                    // 如果整行是块注释
                                     inBlockComment = end;
                                 }
 
@@ -101,7 +90,6 @@ function countLinesInDirectory(dirPath) {
                     }
                     // 如果既不是注释也不是空行，则为代码行
                     if (!isHandled) {
-                        // console.log(a);
                         codeLines++;
                     }
                 }
