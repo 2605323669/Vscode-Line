@@ -1,11 +1,10 @@
 const fs = require("fs")
 const commentPatterns = require("./commentPatterns");
 const path = require("path")
+
 /**
- * 用来统计代码行量
- * @param {*} dirPath 
+ * 根据文件类型选择适当的注释正则表达式
  */
-// 根据文件类型选择适当的注释正则表达式
 function getCommentPatternsByExtension(fileName) {
     // 提取文件后缀
     const fileExtension = fileName.slice(fileName.lastIndexOf('.') + 1);
@@ -17,6 +16,9 @@ function getCommentPatternsByExtension(fileName) {
     return patterns;
 }
 
+/**
+ * 核心功能对文件进行代码统计
+ */
 function countLinesInDirectory(dirPath) {
     return new Promise((resolve, reject) => {
         let emptyLines = 0;
@@ -67,7 +69,6 @@ function countLinesInDirectory(dirPath) {
                                     commentLineCount--;
                                     codeLines++; // 代码部分
                                     inBlockComment = end; // 进入块注释模式
-
                                 }
                                 else {
                                     inBlockComment = end;
@@ -163,6 +164,7 @@ function countLinesInDirectory(dirPath) {
         });
     });
 }
+
 module.exports = {
     countLinesInDirectory
 }

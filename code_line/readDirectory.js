@@ -48,6 +48,9 @@ function processDirectory(filePath, promises, combinedBlacklist) {
     }
 }
 
+/**
+ * 对传进来的目录进行处理
+ */
 function findFiles(filePath, promises, combinedBlacklist) {
     if (!fs.existsSync(filePath)) {
         console.log("您输入的目录不存在！");
@@ -72,7 +75,9 @@ function findFiles(filePath, promises, combinedBlacklist) {
     }
 }
 
-// 格式化日期为 "yyyy-MM-dd HH:mm:ss"
+/**
+ * 格式化日期 
+ */
 function formatDate(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -213,6 +218,9 @@ function generateFilesTable(results, directory) {
     ].join("\n");
 }
 
+/**
+ * 接受目录参数，对结果进行保存输出
+ */
 async function calculateTotalLines(directory, showSummary = false, userExcludeDirs = [], exportResult = false) {
     const promises = [];
     const combinedBlacklist = [...blacklist, ...userExcludeDirs];
@@ -245,47 +253,16 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
             codeLines: 12
         };
 
-        // if (!showSummary) {
-        //     // 打印表头
-        //     outputText += "\n= = = = = = 文件统计信息 = = = = = =\n";
-        //     outputText += "-".repeat(colWidths.path + colWidths.lineCount + colWidths.emptyLines + colWidths.commentLines + colWidths.codeLines) + "\n";
-        //     outputText += "文件路径".padEnd(colWidths.path - 20) +
-        //         "总行数".padEnd(colWidths.lineCount) +
-        //         "空行数".padEnd(colWidths.emptyLines) +
-        //         "注释行数".padEnd(colWidths.commentLines) +
-        //         "有效代码行数".padEnd(colWidths.codeLines) + "\n";
-        //     outputText += "-".repeat(colWidths.path + colWidths.lineCount + colWidths.emptyLines + colWidths.commentLines + colWidths.codeLines) + "\n";
-        // }
-
         // 打印每个文件的统计信息
         const result = [];
         let languageStats = {};
         const finalResults = [];
         results.forEach(({ extension, codeLines, lineCount, emptyLines, commentLineCount, dirPath }) => {
             if (!showSummary) {
-                // const relativePath = path.relative(directory, dirPath);  // 计算相对路径
-                // outputText += relativePath.padEnd(colWidths.path - 14) +
-                //     String(lineCount).padEnd(colWidths.lineCount + 3) +
-                //     String(emptyLines).padEnd(colWidths.emptyLines + 3) +
-                //     String(commentLineCount).padEnd(colWidths.commentLines + 3) +
-                //     String(codeLines).padEnd(colWidths.codeLines) + "\n";
                 totalLineCount += lineCount;
                 totalEmptyLines += emptyLines;
                 totalCommentLineCount += commentLineCount;
                 fileCount += 1;
-                // //在这里totalCodeLines应该在这，但是现在短暂放在外面
-                // result.push({
-                //     dirPath,
-                //     extension,
-                //     codeLines,
-                //     commentLineCount,
-                //     emptyLines,
-                //     lineCount
-                // });
-                // if (!languageCodeLines[extension]) {
-                //     languageCodeLines[extension] = 0;
-                // }
-                // languageCodeLines[extension] += codeLines;
                 totalCodeLines += codeLines;
                 const languageMapping = {
                     "js": "JavaScript",
@@ -316,20 +293,12 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
 
                 // // 添加列标题
                 // let csvContent = 'dirPath,codeLines\n';
-
                 // // 提取 dirPath 和 codeLines 并拼接成 CSV 格式
                 // csvContent += result.map(item => `${item.dirPath},${item.codeLines}`).join('\n');
-
                 // // 指定导出文件路径
                 // const outputPath = path.join(__dirname, 'codeLines_with_dirPath.csv');
-
                 // // 将数据写入 CSV 文件
                 // fs.writeFileSync(outputPath, csvContent);
-
-                // // console.log(`CSV 文件已成功生成: ${outputPath}`);
-
-
-
 
                 // 更新语言统计信息
                 if (!languageStats[language]) {
@@ -341,7 +310,6 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                         commentLineCount: 0
                     };
                 }
-                // console.log(language);
                 languageStats[language].files++;
                 languageStats[language].codeLines += codeLines;
                 languageStats[language].lineCount += lineCount;
@@ -354,7 +322,6 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
             outputText += "\n= = = = = = 文件统计信息 = = = = = =\n";
             outputText += generateFilesTable(result, directory);
         }
-        // outputText += "-".repeat(colWidths.path + colWidths.lineCount + colWidths.emptyLines + colWidths.commentLines + colWidths.codeLines) + "\n";
         for (const language in languageStats) {
             if (languageStats.hasOwnProperty(language)) {
                 finalResults.push({
