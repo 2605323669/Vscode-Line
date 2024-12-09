@@ -218,6 +218,62 @@ function generateFilesTable(results, directory) {
     ].join("\n");
 }
 
+
+/**
+ * 生成文件信息表格框架
+ */
+function generateFolderTable(results) {
+    // 1. 动态计算 filename 列宽
+    const maxFilenameLength = Math.max(...results.map(r => r.directory1.length), 8); // 最小宽度为 "filename".length
+    const colWidths = {
+        directory1: maxFilenameLength + 2, // +2 为了给表格边界留余地
+        files: 12,
+        code: 12,
+        comment: 12,
+        blank: 12,
+        total: 12,
+    };
+
+    // 2. 表头
+    const header = [
+        //进行了手动调整，后续需要修改！
+        `| ${"文件夹".padEnd(colWidths.directory1 - 4)} | `
+        + `${"文件数".padEnd(colWidths.files - 2)} | `
+        + `${"有效行".padStart(colWidths.code - 3)} | `
+        + `${"注释行".padStart(colWidths.comment - 3)} | `
+        + `${"空行".padStart(colWidths.blank - 2)} | `
+        + `${"总行".padStart(colWidths.total - 2)} |`
+    ];
+    const separator = [
+        `+${"-".repeat(colWidths.directory1 + 2)}+`
+        + `${"-".repeat(colWidths.files + 2)}+`
+        + `${"-".repeat(colWidths.code + 2)}+`
+        + `${"-".repeat(colWidths.comment + 2)}+`
+        + `${"-".repeat(colWidths.blank + 2)}+`
+        + `${"-".repeat(colWidths.total + 2)}+`
+    ]; 9
+
+    // 3. 内容行
+    const rows = results.map(({ directory1, files, code, comment, blank, total }) => {
+        return `| ${directory1.padEnd(colWidths.directory1)} | `
+            + `${String(files).padStart(colWidths.files)} | `
+            + `${String(code).padStart(colWidths.code)} | `
+            + `${String(comment).padStart(colWidths.comment)} | `
+            + `${String(blank).padStart(colWidths.blank)} | `
+            + `${String(total).padStart(colWidths.total)} |`;
+    });
+
+
+    // 5. 拼接表格
+    return [
+        separator[0],
+        header[0],
+        separator[0],
+        ...rows,
+        separator[0],
+    ].join("\n");
+}
+
 /**
  * 接受目录参数，对结果进行保存输出
  */
@@ -229,7 +285,6 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
 
     try {
         const results = await Promise.all(promises);
-        // const languageCodeLines = {};
         const date = new Date();
         const formattedDate = formatDate(date);
 
@@ -244,20 +299,46 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
         output += "日期 : " + formattedDate + "\n";
         output += "目录 : " + directory + "\n";
 
-        // 定义列宽
-        const colWidths = {
-            path: 100,
-            lineCount: 10,
-            emptyLines: 10,
-            commentLines: 12,
-            codeLines: 12
-        };
-
         // 打印每个文件的统计信息
         const result = [];
         let languageStats = {};
         const finalResults = [];
+        const directoryStats = {};
+        //new Map();
         results.forEach(({ extension, codeLines, lineCount, emptyLines, commentLineCount, dirPath }) => {
+            // let dirPath1 = path.relative(directory,dirPath);
+            // if(dirPath1.includes('\\')){
+            //     console.log("不是文件！");
+            // }else{
+            //     console.log("是文件！");
+            // }
+            // 获取文件的目录路径
+            const directoryPath = path.dirname(dirPath);
+            let relativeDir2 = directoryPath.replace(directory, '');
+            if (relativeDir2 === '') {
+                relativeDir2 = ".";
+            }
+
+            if (!directoryStats[relativeDir2]) {
+                directoryStats[relativeDir2] = {
+                    files: 0,
+                    code: 0,
+                    comment: 0,
+                    blank: 0,
+                    total: 0
+                };
+            }
+
+            directoryStats[relativeDir2].files++;
+            directoryStats[relativeDir2].code += codeLines;
+            directoryStats[relativeDir2].comment += commentLineCount;
+            directoryStats[relativeDir2].blank += emptyLines;
+            directoryStats[relativeDir2].total += lineCount;
+            // 如果目录统计数据中还没有这个目录，初始化它
+            // if (!directoryStats.has(directoryPath)) {
+            //     directoryStats.set(directoryPath, { files: 0, code: 0, comment: 0, blank: 0, total: 0 });
+            // }
+
             if (!showSummary) {
                 totalLineCount += lineCount;
                 totalEmptyLines += emptyLines;
@@ -322,6 +403,20 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
             outputText += "\n= = = = = = 文件统计信息 = = = = = =\n";
             outputText += generateFilesTable(result, directory);
         }
+        let dirPathStats = [];
+        for (const directory1 in directoryStats) {
+            if (directoryStats.hasOwnProperty(directory1)) {
+                dirPathStats.push({
+                    directory1,
+                    files: directoryStats[directory1].files,
+                    code: directoryStats[directory1].code,
+                    comment: directoryStats[directory1].comment,
+                    blank: directoryStats[directory1].blank,
+                    total: directoryStats[directory1].total
+                });
+            }
+        }
+
         for (const language in languageStats) {
             if (languageStats.hasOwnProperty(language)) {
                 finalResults.push({
@@ -336,7 +431,9 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
         }
         output += "总计 : " + fileCount + "个文件，" + totalCodeLines + "行代码，" + totalCommentLineCount + "行注释，" + totalEmptyLines
             + "个空行，" + "全部共" + totalLineCount + "行。\n\n";
-        output += "= = = = = = 编程语言 = = = = = =\n";
+        output += "= = = = = = 目录 = = = = = =\n";;
+        output += generateFolderTable(dirPathStats)
+        output += "\n\n= = = = = = 编程语言 = = = = = =\n";
         output += generateLanguagesTable(finalResults);
         output += "\n" + outputText;
         console.log(output);
