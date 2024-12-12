@@ -224,7 +224,7 @@ function generateFilesTable(results, directory) {
  */
 function generateFolderTable(results) {
     // 1. 动态计算 filename 列宽
-    const maxFilenameLength = Math.max(...results.map(r => 
+    const maxFilenameLength = Math.max(...results.map(r =>
         r.directory.length
     ), 8); // 最小宽度为 "filename".length
     const colWidths = {
@@ -278,14 +278,12 @@ function generateFolderTable(results) {
 
 function mergeSubdirectories(directoryStats) {
     const dirs = Object.keys(directoryStats);
-
     // 按路径长度排序，确保子目录在父目录之前
     dirs.sort((a, b) => b.length - a.length);
-
     dirs.forEach(dir => {
         const parentDir = path.dirname(dir); // 获取父目录
-        // console.log(dir + "  " + parentDir);
-        if (parentDir !== "." && directoryStats[parentDir]) {
+        // console.log(parentDir);
+        if (parentDir !== ".(files)" && directoryStats[parentDir]) {
             directoryStats[parentDir].files += directoryStats[dir].files;
             directoryStats[parentDir].code += directoryStats[dir].code;
             directoryStats[parentDir].comment += directoryStats[dir].comment;
@@ -327,13 +325,12 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
         const finalResults = [];
         const directoryStats = {};
         const aggregatedDirectoryStats = {};
-        //new Map();
-        let dirPathSt = [];//用来临时存放文件夹的
+
         results.forEach(({ extension, codeLines, lineCount, emptyLines, commentLineCount, dirPath }) => {
+            //用来处理文件夹内的文件统计（不处理文件夹呢还有文件夹的情况）
             const directoryPath = path.dirname(dirPath);
             let relativeDir = path.relative(directory, directoryPath);
-            if (relativeDir === '') relativeDir = ".";
-
+            if (relativeDir === '') relativeDir = ".(files)";
             if (!directoryStats[relativeDir]) {
                 directoryStats[relativeDir] = {
                     files: 0,
@@ -343,112 +340,12 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                     total: 0
                 };
             }
+
             directoryStats[relativeDir].files++;
             directoryStats[relativeDir].code += codeLines;
             directoryStats[relativeDir].comment += commentLineCount;
             directoryStats[relativeDir].blank += emptyLines;
             directoryStats[relativeDir].total += lineCount;
-            // let dirPath1 = path.relative(directory,dirPath);
-            // if(dirPath1.includes('\\')){
-            //     console.log("不是文件！");
-            // }else{
-            //     console.log("是文件！");
-            // }
-            // 获取文件的目录路径
-            // const directoryPath = path.dirname(dirPath);
-            // let relativeDir2 = directoryPath.replace(directory, '');
-            // if (relativeDir2 === '') {
-            //     relativeDir2 = ".";
-            // } else {
-            //     relativeDir2 += "(files)"
-            // }
-            // // console.log(relativeDir2);
-            // if (!directoryStats[relativeDir2]) {
-            //     directoryStats[relativeDir2] = {
-            //         files: 0,
-            //         code: 0,
-            //         comment: 0,
-            //         blank: 0,
-            //         total: 0,
-            //     };
-            // }
-
-            // directoryStats[relativeDir2].files++;
-            // directoryStats[relativeDir2].code += codeLines;
-            // directoryStats[relativeDir2].comment += commentLineCount;
-            // directoryStats[relativeDir2].blank += emptyLines;
-            // directoryStats[relativeDir2].total += lineCount;
-
-            // let parentDir = relativeDir2;
-
-
-            // let parts = parentDir.split("\\");
-            // let extractedPathParts = parts.slice(0, parts.length - 1);
-
-            // // 将数组元素重新组合成字符串
-            // let extractedPath = extractedPathParts.join("\\");
-
-            // // console.log(extractedPath);
-            // while (extractedPath) {
-            //     let extractedPath1 = extractedPath;
-            //     directoryStats[extractedPath1] = {
-            //         files: 0,
-            //         code: 0,
-            //         comment: 0,
-            //         blank: 0,
-            //         total: 0,
-            //     };
-            //     // directoryStats[extractedPath1].files += directoryStats[relativeDir2].files;
-            //     // directoryStats[extractedPath1].code += directoryStats[relativeDir2].code;
-            //     // directoryStats[extractedPath1].comment += directoryStats[relativeDir2].comment;
-            //     // directoryStats[extractedPath1].blank += directoryStats[relativeDir2].blank;
-            //     // directoryStats[extractedPath1].total += directoryStats[relativeDir2].total;
-            //     // console.log(extractedPath1);
-            //     let extractedPath2 = extractedPath1;
-            //     extractedPath2 += "(files)";
-            //     // console.log(extractedPath2);
-            //     dirPathSt.push({
-            //         extractedPath1: extractedPath1,
-            //         relativeDir2: relativeDir2,
-            //         extractedPath2: extractedPath2,
-
-            //     });
-            //     // directoryStats[extractedPath1].files += directoryStats[extractedPath2].files;
-            //     // directoryStats[extractedPath1].code += directoryStats[extractedPath2].code;
-            //     // directoryStats[extractedPath1].comment += directoryStats[extractedPath2].comment;
-            //     // directoryStats[extractedPath1].blank += directoryStats[extractedPath2].blank;
-            //     // directoryStats[extractedPath1].total += directoryStats[extractedPath2].total;
-            //     parts = extractedPath.split("\\");
-            //     extractedPathParts = parts.slice(0, parts.length - 1);
-            //     extractedPath = extractedPathParts.join("\\");
-            // }
-            // while (parentDir && parentDir !== "." && parentDir !== path.parse(directory).root) {
-            //     parentDir = path.dirname(parentDir);
-            //     console.log("Current parentDir:", parentDir);
-
-            //     if (!directoryStats[parentDir]) {
-            //         directoryStats[parentDir] = {
-            //             files: 0,
-            //             code: 0,
-            //             comment: 0,
-            //             blank: 0,
-            //             total: 0,
-            //         };
-            //     }
-
-            //     directoryStats[parentDir].files++;
-            //     directoryStats[parentDir].code += codeLines;
-            //     directoryStats[parentDir].comment += commentLineCount;
-            //     directoryStats[parentDir].blank += emptyLines;
-            //     directoryStats[parentDir].total += lineCount;
-            //     if (parentDir === path.parse(directory).root) {
-            //         break;
-            //     }
-            // }
-            // 如果目录统计数据中还没有这个目录，初始化它
-            // if (!directoryStats.has(directoryPath)) {
-            //     directoryStats.set(directoryPath, { files: 0, code: 0, comment: 0, blank: 0, total: 0 });
-            // }
 
             if (!showSummary) {
                 totalLineCount += lineCount;
@@ -509,25 +406,23 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                 languageStats[language].commentLineCount += commentLineCount;
             }
         });
+        //进行深拷贝
         Object.keys(directoryStats).forEach(dir => {
             aggregatedDirectoryStats[dir] = { ...directoryStats[dir] };
         });
         mergeSubdirectories(aggregatedDirectoryStats);
         const combinedStats = [];
+        if (fileCount !== directoryStats[".(files)"].files) {
+            combinedStats.push({
+                directory: ".",
+                files: fileCount,
+                code: totalCodeLines,
+                comment: totalCommentLineCount,
+                blank: totalEmptyLines,
+                total: totalLineCount
+            });
+        }
         Object.keys(aggregatedDirectoryStats).forEach(dir => {
-            // combinedStats.push({
-            //     directory: dir,
-            //     isDirect: false,
-            //     ...aggregatedDirectoryStats[dir],
-            // });
-
-            // if (directoryStats[dir]) {
-            //     combinedStats.push({
-            //         directory: `${dir} (files)`,
-            //         isDirect: true,
-            //         ...directoryStats[dir],
-            //     });
-            // }
             const direct = directoryStats[dir];
             const aggregated = aggregatedDirectoryStats[dir];
 
@@ -560,25 +455,6 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                 }
             }
         });
-        let ttue = [];
-        // console.log(dirPathSt);
-
-        // dirPathSt.forEach(obj => {
-        //     if (!ttue[obj.extractedPath2]) {
-        //         directoryStats[obj.extractedPath1].files += directoryStats[obj.relativeDir2].files + directoryStats[obj.extractedPath2].files;
-        //         directoryStats[obj.extractedPath1].code += directoryStats[obj.relativeDir2].code + directoryStats[obj.extractedPath2].code;
-        //         directoryStats[obj.extractedPath1].comment += directoryStats[obj.relativeDir2].comment + directoryStats[obj.extractedPath2].comment;
-        //         directoryStats[obj.extractedPath1].blank += directoryStats[obj.relativeDir2].blank + directoryStats[obj.extractedPath2].blank;
-        //         directoryStats[obj.extractedPath1].total += directoryStats[obj.relativeDir2].total + directoryStats[obj.extractedPath2].total;
-        //         ttue[obj.extractedPath2] = true;
-        //     } else {
-        //         directoryStats[obj.extractedPath1].files += directoryStats[obj.relativeDir2].files;
-        //         directoryStats[obj.extractedPath1].code += directoryStats[obj.relativeDir2].code;
-        //         directoryStats[obj.extractedPath1].comment += directoryStats[obj.relativeDir2].comment;
-        //         directoryStats[obj.extractedPath1].blank += directoryStats[obj.relativeDir2].blank;
-        //         directoryStats[obj.extractedPath1].total += directoryStats[obj.relativeDir2].total;
-        //     }
-        // })
 
         if (!showSummary) {
             // 打印表头
@@ -598,7 +474,6 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                 });
             }
         }
-
         for (const language in languageStats) {
             if (languageStats.hasOwnProperty(language)) {
                 finalResults.push({
