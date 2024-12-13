@@ -1,4 +1,5 @@
-const readDirectory = require("./readDirectory");
+#!/usr/bin/env node
+const readDirectory = require("./code_line/readDirectory");
 const fs = require("fs")
 const promptSync = require('prompt-sync')();
 
