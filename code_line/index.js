@@ -7,7 +7,7 @@ const params = process.argv.slice(2);  // 使用 slice 而不是 splice，第二
 const filePath = params[0];
 
 if (params.length < 1) {
-    console.error('用法: node index <路径> [--summary] [--export] [--exclude <排除目录1> <排除目录2> ...]');
+    console.error('用法: node index <路径> [--summary] [--export] [--exclude <排除目录1> <排除目录2> ...] [--type]');
     process.exit(1);
 }
 
@@ -16,6 +16,7 @@ let exportResult = false; // 新增参数，用于控制是否导出结果
 let exclude = false;
 let userExcludeDirs = [];//用于接受用户输入的排除目录
 let input = "";
+let fileTypes = [];
 
 try {
     //验证路径或文件夹路径或文件路径是否存在
@@ -36,6 +37,10 @@ if (params.length > 1) {
             showSummary = true;
         } else if (params[i] === "--export") {
             exportResult = true;
+        } else if (params[i] === "--type") {
+            while (i + 1 < params.length && !params[i + 1].startsWith("--")) {
+                fileTypes.push(params[++i]); // 收集文件类型
+            }
         } else if (params[i] === ("--exclude")) {
             exclude = true;
             while (i + 1 < params.length) {
@@ -47,7 +52,7 @@ if (params.length > 1) {
                 }
             }
         } else {
-            console.error('用法: node index <路径> [--summary] [--export] [--exclude <排除目录1> <排除目录2> ...]');
+            console.error('用法: node index <路径> [--summary] [--export] [--exclude <排除目录1> <排除目录2> ...][--type]');
             process.exit(1);
         }
     }
@@ -65,4 +70,4 @@ if (exclude) {
     // console.log("\n");
 }
 
-readDirectory.calculateTotalLines(filePath, showSummary, userExcludeDirs, exportResult);
+readDirectory.calculateTotalLines(filePath, showSummary, userExcludeDirs, exportResult, fileTypes);

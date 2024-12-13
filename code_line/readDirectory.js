@@ -19,8 +19,12 @@ function isBlackListed(filePath, combinedBlacklist) {
 /**
  * 处理文件逻辑
  */
-function processFile(filePath, promises) {
-    const ext = path.extname(filePath);
+function processFile(filePath, promises, findFiless) {
+    const ext = path.extname(filePath); // 去掉扩展名前的点
+    if (findFiless.length > 0 && !findFiless.includes(ext.slice(1))) {
+        // console.log(findFiless);
+        return; // 跳过不在用户指定类型中的文件
+    }
     if (validFileExtensions.includes(ext)) {
         promises.push(countLines.countLinesInDirectory(filePath));
     }
@@ -29,7 +33,7 @@ function processFile(filePath, promises) {
 /**
  * 递归处理文件夹逻辑
  */
-function processDirectory(filePath, promises, combinedBlacklist) {
+function processDirectory(filePath, promises, combinedBlacklist, findFiless) {
 
     // 读取文件夹内容,返回目录下文件数组列表如：[ '.git', 'app.js', 'code_line', 'read.js', 'README.md' ]
     const files = fs.readdirSync(filePath);
@@ -39,11 +43,11 @@ function processDirectory(filePath, promises, combinedBlacklist) {
 
         // 如果是文件夹，递归处理
         if (stats.isDirectory()) {
-            findFiles(fullPath, promises, combinedBlacklist);
+            findFiles(fullPath, promises, combinedBlacklist, findFiless);
 
             // 如果是文件，处理文件
         } else if (stats.isFile()) {
-            processFile(fullPath, promises);
+            processFile(fullPath, promises, findFiless);
         }
     }
 }
@@ -51,7 +55,8 @@ function processDirectory(filePath, promises, combinedBlacklist) {
 /**
  * 对传进来的目录进行处理
  */
-function findFiles(filePath, promises, combinedBlacklist) {
+function findFiles(filePath, promises, combinedBlacklist, findFiless) {
+
     if (!fs.existsSync(filePath)) {
         console.log("您输入的目录不存在！");
         return;
@@ -64,11 +69,11 @@ function findFiles(filePath, promises, combinedBlacklist) {
 
         // 如果是目录，处理目录
         if (stats.isDirectory()) {
-            processDirectory(filePath, promises, blacklist);
+            processDirectory(filePath, promises, blacklist, findFiless);
 
             // 如果是文件，处理文件
         } else if (stats.isFile()) {
-            processFile(filePath, promises);
+            processFile(filePath, promises, findFiless);
         }
     } catch (error) {
         console.error(`文件系统操作出现错误: ${error.message}`);
@@ -297,14 +302,20 @@ function mergeSubdirectories(directoryStats) {
 /**
  * 接受目录参数，对结果进行保存输出
  */
-async function calculateTotalLines(directory, showSummary = false, userExcludeDirs = [], exportResult = false) {
+async function calculateTotalLines(directory, showSummary = false, userExcludeDirs = [], exportResult = false, fileTypes = []) {
     const promises = [];
     const combinedBlacklist = [...blacklist, ...userExcludeDirs];
 
-    findFiles(directory, promises, combinedBlacklist);
+    findFiles(directory, promises, combinedBlacklist, fileTypes);
 
     try {
         const results = await Promise.all(promises);
+
+        if (results.length === 0) {
+            console.log("没有找到指定类型的文件，请检查文件类型或目录！");
+            return; // 直接退出函数
+        }
+
         const date = new Date();
         const formattedDate = formatDate(date);
 

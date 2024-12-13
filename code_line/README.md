@@ -16,6 +16,7 @@
 - **详细报告生成**：生成包含编程语言分布、文件分布以及目录分布的详细报告。
 - **自定义排除**：允许用户通过命令行参数排除特定的目录或文件。
 - **结果导出**：允许用户将统计结果导出到 `output.txt` 文件中。
+- **指定文件类型统计**：允许用户指定特定的文件类型进行统计，例如仅统计 `.js` 或 `.py` 文件。
 
 ## 安装与依赖
 
@@ -39,20 +40,26 @@
    - `--summary`：可选参数，用于控制是否简化输出结果。如果指定此参数，则只显示总计信息。
    - `--export`：可选参数，用于控制是否将结果导出到 `output.txt` 文件中。如果指定此参数，则结果将被导出到该文件。
    - `--exclude`：可选参数，用于排除特定的目录或文件。可以指定多个排除目录或文件，它们之间用空格分隔。
+   - `--type`：可选参数，用于指定要统计的文件类型，例如 js 或 py。
 
 2. **示例**：
-   - 统计当前目录下的所有文件（不包括子目录）的代码行数等信息，并简化输出结果：
+   - 统计当前目录下的所有文件的代码行数等信息，并简化输出结果：
      ```bash
      node node_modules/code-line-reporter/index.js F:\node_pkg --summary
      ```
-   - 统计指定目录（例如 `src`）的代码行数等信息，并将结果导出到 `output.txt` 文件中：
+   - 统计指定目录（例如 `F:\node_pkg`）的代码行数等信息，并将结果导出到 `output.txt` 文件中：
      ```bash
      node node_modules/code-line-reporter/index.js F:\node_pkg --export
      ```
-   - 统计指定目录（例如 `src`）的代码行数等信息，排除 `test` 和 `build` 目录：
+   - 统计指定目录（例如 `F:\node_pkg`）的代码行数等信息，排除 `test` 和 `build` 目录：
      ```bash
      node node_modules/code-line-reporter/index.js F:\node_pkg --exclude test build
      ```
+   - 统计指定目录（例如  `F:\node_pkg`）的代码行数等信息，仅统计 .js .py文件(注：文件后缀名！)：
+     ```bash
+    node node_modules/code-line-reporter/index.js F:\node_pkg --type js
+      ```
+    -这些指令并不是只能单独试
 
 ## 输出示例
 
