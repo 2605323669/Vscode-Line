@@ -33,7 +33,7 @@
 
 1. **运行程序**：在项目根目录下，通过终端运行以下命令来统计指定目录的代码行数等信息：
    ```bash
-   node node_modules/code-line-reporter/index.js <路径> [--summary] [--export] [--exclude <排除目录1> <排除目录2> ...]
+   code-line-reporter <路径> [--summary] [--export] [--exclude <排除目录1> <排除目录2> ...] [--type]
    ```
    其中：
    - `<路径>`：要统计的目录路径。
@@ -45,19 +45,19 @@
 2. **示例**：
    - 统计当前目录下的所有文件的代码行数等信息，并简化输出结果：
      ```bash
-     node node_modules/code-line-reporter/index.js F:\node_pkg --summary
+     code-line-reporter F:\node_pkg --summary
      ```
    - 统计指定目录（例如 `F:\node_pkg`）的代码行数等信息，并将结果导出到 `output.txt` 文件中：
      ```bash
-     node node_modules/code-line-reporter/index.js F:\node_pkg --export
+     code-line-reporter F:\node_pkg --export
      ```
    - 统计指定目录（例如 `F:\node_pkg`）的代码行数等信息，排除 `test` 和 `build` 目录：
      ```bash
-     node node_modules/code-line-reporter/index.js F:\node_pkg --exclude test build
+     code-line-reporter F:\node_pkg --exclude test build
      ```
    - 统计指定目录（例如  `F:\node_pkg`）的代码行数等信息，仅统计 .js .py文件(注：文件后缀名！)：
      ```bash
-    node node_modules/code-line-reporter/index.js F:\node_pkg --type js
+    code-line-reporter F:\node_pkg --type js
       ```
     -这些指令并不是只能单独试
 

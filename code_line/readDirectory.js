@@ -306,7 +306,10 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
     const promises = [];
     const combinedBlacklist = [...blacklist, ...userExcludeDirs];
 
+    const start1 = Date.now();
     findFiles(directory, promises, combinedBlacklist, fileTypes);
+    const end1 = Date.now();
+    console.log(`Project1 took ${end1 - start1} ms`);
 
     try {
         const results = await Promise.all(promises);
@@ -423,16 +426,16 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
         });
         mergeSubdirectories(aggregatedDirectoryStats);
         const combinedStats = [];
-        if (fileCount !== directoryStats[".(files)"].files) {
-            combinedStats.push({
-                directory: ".",
-                files: fileCount,
-                code: totalCodeLines,
-                comment: totalCommentLineCount,
-                blank: totalEmptyLines,
-                total: totalLineCount
-            });
-        }
+        // if (fileCount !== directoryStats[".(files)"].files) {//未处理如何跟录下没有文件的情况
+        //     combinedStats.push({
+        //         directory: ".",
+        //         files: fileCount,
+        //         code: totalCodeLines,
+        //         comment: totalCommentLineCount,
+        //         blank: totalEmptyLines,
+        //         total: totalLineCount
+        //     });
+        // }
         Object.keys(aggregatedDirectoryStats).forEach(dir => {
             const direct = directoryStats[dir];
             const aggregated = aggregatedDirectoryStats[dir];
@@ -466,7 +469,6 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                 }
             }
         });
-
         if (!showSummary) {
             // 打印表头
             outputText += "\n= = = = = = 文件统计信息 = = = = = =\n";
@@ -485,6 +487,7 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                 });
             }
         }
+
         for (const language in languageStats) {
             if (languageStats.hasOwnProperty(language)) {
                 finalResults.push({
