@@ -309,7 +309,7 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
     const start1 = Date.now();
     findFiles(directory, promises, combinedBlacklist, fileTypes);
     const end1 = Date.now();
-    console.log(`Project1 took ${end1 - start1} ms`);
+    console.log(`操作耗时：${end1 - start1} 毫秒`);
 
     try {
         const results = await Promise.all(promises);

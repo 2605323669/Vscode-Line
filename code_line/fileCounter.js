@@ -24,7 +24,7 @@ function countLinesInDirectory(dirPath) {
         let emptyLines = 0;
         let codeLines = 0;
         let commentLineCount = 0;//注释行数
-        let inBlockComment = null; // 用于存储当前块注释的结束标记
+        // let inBlockComment = null; // 用于存储当前块注释的结束标记
 
         // 读取文件并统计行数  
         fs.readFile(dirPath, 'utf8', (err, data) => {
@@ -32,70 +32,93 @@ function countLinesInDirectory(dirPath) {
                 return reject(new Error(`无法读取文件: ${err.message}`));
             }
             try {
-                const languageConfig = getCommentPatternsByExtension(dirPath);
-                const lineComments = languageConfig.lineComments || [];
-                const blockComments = languageConfig.blockComments || [];
-                const lines = data.split('\n');
+                // const languageConfig = getCommentPatternsByExtension(dirPath);
+                // const lineComments = languageConfig.lineComments || [];
+                // const blockComments = languageConfig.blockComments || [];
+                // const lines = data.split('\n');
 
-                for (let line of lines) {
-                    line = line.trim();
+                // for (let line of lines) {
+                //     line = line.trim();
 
-                    if (line === '') {
-                        if (!inBlockComment) {
-                            emptyLines++;
-                        } else {
-                            commentLineCount++;
-                        }
-                        continue;
+                //     if (line === '') {
+                //         if (!inBlockComment) {
+                //             emptyLines++;
+                //         } else {
+                //             commentLineCount++;
+                //         }
+                //         continue;
+                //     }
+
+                //     // 如果在多行注释内
+                //     if (inBlockComment) {
+                //         commentLineCount++;
+
+                //         if (line.includes(inBlockComment)) {
+                //             inBlockComment = null;
+                //         }
+                //         continue;
+                //     }
+                //     let isHandled = false;
+                //     if (blockComments.length > 0) {
+                //         for (const [start, end] of blockComments) {
+                //             const blockStartIndex = line.indexOf(start);
+                //             const blockEndIndex = line.indexOf(end);
+                //             if (blockStartIndex !== -1) {
+                //                 commentLineCount++;
+                //                 if (blockStartIndex > 0) {
+                //                     commentLineCount--;
+                //                     codeLines++; // 代码部分
+                //                     inBlockComment = end; // 进入块注释模式
+                //                 }
+                //                 else {
+                //                     inBlockComment = end;
+                //                 }
+
+                //                 // 如果块注释起始标记和结束标记在同一行
+                //                 if (blockEndIndex > blockStartIndex) {
+                //                     inBlockComment = null; // 结束块注释
+
+                //                 }
+                //                 isHandled = true; // 当前行已处理
+                //                 break;
+                //             }
+                //         }
+                //     }
+                //     // 检查是否为单行注释
+                //     if (!isHandled && lineComments.some(comment => line.startsWith(comment))) {
+                //         commentLineCount++;
+                //         isHandled = true;
+                //     }
+                //     // 如果既不是注释也不是空行，则为代码行
+                //     if (!isHandled) {
+                //         codeLines++;
+                //     }
+                // }
+                const lineCount = data.split('\n').length;//总行数
+                const patterns = getCommentPatternsByExtension(dirPath);
+                // const updatedContent = data.replace(patterns.multiLine, '/*COMMENT*/');
+                const updatedContent = data.replace(patterns.multiLine, (match) => {
+                    // console.log("Matched Comment:\n", match); // 输出匹配到的字符串
+                    return '/*COMMENT*/'; // 替换为占位内容
+                });
+                const lines = updatedContent.split('\n');
+                const regex = /^\/\*COMMENT\*/;
+                lines.forEach(line => {
+                    if (line.trim() === '') {
+                        emptyLines++;
                     }
-
-                    // 如果在多行注释内
-                    if (inBlockComment) {
-                        commentLineCount++;
-
-                        if (line.includes(inBlockComment)) {
-                            inBlockComment = null;
-                        }
-                        continue;
-                    }
-                    let isHandled = false; 
-                    if (blockComments.length > 0) {
-                        for (const [start, end] of blockComments) {
-                            const blockStartIndex = line.indexOf(start);
-                            const blockEndIndex = line.indexOf(end);
-                            if (blockStartIndex !== -1) {
-                                commentLineCount++;
-                                if (blockStartIndex > 0) {
-                                    commentLineCount--;
-                                    codeLines++; // 代码部分
-                                    inBlockComment = end; // 进入块注释模式
-                                }
-                                else {
-                                    inBlockComment = end;
-                                }
-
-                                // 如果块注释起始标记和结束标记在同一行
-                                if (blockEndIndex > blockStartIndex) {
-                                    inBlockComment = null; // 结束块注释
-
-                                }
-                                isHandled = true; // 当前行已处理
-                                break;
+                    // else if (line.trim() !== '/*COMMENT*/') {
+                    else if (!line.trim().match(regex)) {
+                        if (patterns.singleLine) {
+                            if (!line.trim().match(patterns.singleLine)) {
+                                codeLines++;
                             }
                         }
                     }
-                    // 检查是否为单行注释
-                    if (!isHandled && lineComments.some(comment => line.startsWith(comment))) {
-                        commentLineCount++;
-                        isHandled = true;
-                    }
-                    // 如果既不是注释也不是空行，则为代码行
-                    if (!isHandled) {
-                        codeLines++;
-                    }
-                }
+                });
+                commentLineCount = lineCount - emptyLines - codeLines;
                 const extension = dirPath.slice(dirPath.lastIndexOf('.') + 1);
-                let lineCount = emptyLines + commentLineCount + codeLines;
+                // let lineCount = emptyLines + commentLineCount + codeLines;
                 resolve({
                     extension,
                     dirPath,
