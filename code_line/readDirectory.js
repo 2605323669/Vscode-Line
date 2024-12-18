@@ -6,6 +6,9 @@ const blacklist = require('./blackList');
 
 /**
  * 检查文件路径是否在黑名单中
+ * @param {string} filePath -文件路径
+ * @param {Array<string>} combinedBlacklist -黑名单
+ * @returns {boolean} 如果文件路径包含黑名单中的任意模式，则返回 `true`，否则返回 `false`。
  */
 function isBlackListed(filePath, combinedBlacklist) {
     for (let pattern of combinedBlacklist) {
@@ -17,7 +20,15 @@ function isBlackListed(filePath, combinedBlacklist) {
 }
 
 /**
- * 处理文件逻辑
+ * 处理文件路径，检查文件类型并计数行数
+ * 
+ * 该函数根据文件的扩展名判断是否需要处理该文件。如果文件类型在用户指定的文件类型列表中，则将其加入处理队列。
+ * 如果文件是有效的文件类型，它会将文件路径添加到 promises 数组中，执行行数计数操作。
+ * 
+ * @param {string} filePath - 文件路径，表示要处理的目标文件路径。
+ * @param {Array<Promise>} promises - Promise 数组，用于存储异步操作（例如行数统计）的任务。
+ * @param {Array<string>} findFiless - 用户指定的文件类型数组，用于筛选需要处理的文件类型。
+ * @returns {void} 如果文件符合条件，异步任务会被添加到 promises 中；否则，函数直接返回。
  */
 function processFile(filePath, promises, findFiless) {
     const ext = path.extname(filePath); // 去掉扩展名前的点
@@ -30,7 +41,16 @@ function processFile(filePath, promises, findFiless) {
 }
 
 /**
- * 递归处理文件夹逻辑
+ * 处理指定目录中的文件和子目录
+ * 
+ * 该函数会读取指定目录的内容，并遍历其中的文件和子目录。如果遇到子目录，它会递归调用自身来处理该子目录；
+ * 如果遇到文件，它会将文件传递给 `processFile` 函数进行处理。此函数支持黑名单过滤和文件类型过滤。
+ * 
+ * @param {string} filePath - 目录路径，表示需要处理的目标文件夹路径。
+ * @param {Array<Promise>} promises - Promise 数组，用于存储异步操作（例如文件处理）的任务。
+ * @param {Array<string>} combinedBlacklist - 黑名单，包含不应处理的目录或文件的模式。
+ * @param {Array<string>} findFiless - 用户指定的文件类型数组，仅处理该数组中包含的文件类型。
+ * @returns {void} 该函数没有返回值，它会直接影响 `promises` 数组，添加需要处理的异步任务。
  */
 function processDirectory(filePath, promises, combinedBlacklist, findFiless) {
 
@@ -52,7 +72,16 @@ function processDirectory(filePath, promises, combinedBlacklist, findFiless) {
 }
 
 /**
- * 对传进来的目录进行处理
+ * 查找并处理指定路径的文件或目录
+ * 
+ * 该函数检查指定的路径是否存在，如果存在，则根据路径类型（文件或目录）进行处理。对于目录，它会调用 `processDirectory` 函数来处理该目录中的文件和子目录；
+ * 对于文件，它会调用 `processFile` 函数来处理该文件。还支持黑名单检查，跳过不需要处理的路径。
+ * 
+ * @param {string} filePath - 文件或目录路径，表示需要查找和处理的目标路径。
+ * @param {Array<Promise>} promises - Promise 数组，用于存储异步操作（例如文件处理）的任务。
+ * @param {Array<string>} combinedBlacklist - 黑名单，包含不应处理的目录或文件的模式。
+ * @param {Array<string>} findFiless - 用户指定的文件类型数组，仅处理该数组中包含的文件类型。
+ * @returns {void} 该函数没有返回值，直接影响文件和目录的处理流程。
  */
 function findFiles(filePath, promises, combinedBlacklist, findFiless) {
     if (!fs.existsSync(filePath)) {
@@ -279,13 +308,22 @@ function generateFolderTable(results) {
     ].join("\n");
 }
 
+/**
+ * 合并子目录的数据到父目录
+ * 
+ * 该函数用于合并每个子目录的数据到其父目录。通过遍历所有目录路径并按照路径长度排序（确保子目录在父目录之前），将每个子目录的统计数据累加到父目录中。
+ * 合并的统计数据包括文件数、代码行数、注释行数、空白行数和总行数。
+ * 
+ * @param {Object} directoryStats - 目录统计信息对象，键为目录路径，值为该目录的统计数据。
+ * @returns {void} 该函数没有返回值，直接修改传入的 `directoryStats` 对象。
+ */
 function mergeSubdirectories(directoryStats) {
     const dirs = Object.keys(directoryStats);
+
     // 按路径长度排序，确保子目录在父目录之前
     dirs.sort((a, b) => b.length - a.length);
     dirs.forEach(dir => {
         const parentDir = path.dirname(dir); // 获取父目录
-        // console.log(parentDir);
         if (parentDir !== ".(files)" && directoryStats[parentDir]) {
             directoryStats[parentDir].files += directoryStats[dir].files;
             directoryStats[parentDir].code += directoryStats[dir].code;
@@ -301,14 +339,12 @@ function mergeSubdirectories(directoryStats) {
  * 接受目录参数，对结果进行保存输出
  */
 async function calculateTotalLines(directory, showSummary = false, userExcludeDirs = [], exportResult = false, fileTypes = []) {
-    // let ceshi1 = "D:\\zuoye\\Code-Line\\code_line"
-    // let ceshi2 = "code_line"
-    // console.log(ceshi1.includes(ceshi2));
     const promises = [];
     const combinedBlacklist = [...blacklist, ...userExcludeDirs];
-
     const start1 = Date.now();
+
     findFiles(directory, promises, combinedBlacklist, fileTypes);
+
     const end1 = Date.now();
     console.log(`操作耗时：${end1 - start1} 毫秒`);
 
@@ -322,6 +358,11 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
 
         const date = new Date();
         const formattedDate = formatDate(date);
+        const result = [];//用来统计每个文件行数信息
+        const finalResults = [];
+        const directoryStats = {};//用来统计文件夹内的文件信息（不包括文件内还有文件夹）
+        const aggregatedDirectoryStats = {};//用来统计文件夹还有文件夹的信息
+        const combinedStats = [];//用来合并整个统计文件夹的信息
 
         let totalLineCount = 0;
         let totalEmptyLines = 0;
@@ -330,19 +371,14 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
         let fileCount = 0;
         let output = "";
         let outputText = "";
+        let languageStats = {};//用来统计每种编程语言的行数信息
+        let dirPathStats = [];//用
 
         output += "日期 : " + formattedDate + "\n";
         output += "目录 : " + directory + "\n";
 
-        // 打印每个文件的统计信息
-        const result = [];
-        let languageStats = {};
-        const finalResults = [];
-        const directoryStats = {};
-        const aggregatedDirectoryStats = {};
-
         results.forEach(({ extension, codeLines, lineCount, emptyLines, commentLineCount, dirPath }) => {
-            //用来处理文件夹内的文件统计（不处理文件夹呢还有文件夹的情况）
+            //用来统计文件夹内文件信息
             const directoryPath = path.dirname(dirPath);
             let relativeDir = path.relative(directory, directoryPath);
             if (relativeDir === '') relativeDir = ".(files)";
@@ -380,6 +416,8 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                 "inl": "C++",
                 "rs": "Rust"
             };
+
+            //用来统计总的行数相关信息
             totalLineCount += lineCount;
             totalEmptyLines += emptyLines;
             totalCommentLineCount += commentLineCount;
@@ -424,12 +462,12 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
             languageStats[language].emptyLines += emptyLines;
             languageStats[language].commentLineCount += commentLineCount;
         });
-        //进行深拷贝
+
+        //进行深拷贝，为了统计文件夹内包括文件夹的信息
         Object.keys(directoryStats).forEach(dir => {
             aggregatedDirectoryStats[dir] = { ...directoryStats[dir] };
         });
         mergeSubdirectories(aggregatedDirectoryStats);
-        const combinedStats = [];
         Object.keys(aggregatedDirectoryStats).forEach(dir => {
             const direct = directoryStats[dir];
             const aggregated = aggregatedDirectoryStats[dir];
@@ -448,6 +486,7 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                     ...aggregated,
                 });
             } else {
+
                 // 汇总统计
                 combinedStats.push({
                     directory: dir,
@@ -468,7 +507,6 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
             outputText += "\n= = = = = = 文件统计信息 = = = = = =\n";
             outputText += generateFilesTable(result, directory);
         }
-        let dirPathStats = [];
         for (const directory1 in directoryStats) {
             if (directoryStats.hasOwnProperty(directory1)) {
                 dirPathStats.push({
