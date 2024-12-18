@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const { mainModule } = require("process");
 const readDirectory = require("./code_line/readDirectory");
 const fs = require("fs")
 const promptSync = require('prompt-sync')();
@@ -110,19 +111,26 @@ function parseExcludeDirectories(exclude) {
     return userExcludeDirs;
 }
 
-// 解析命令行参数
-const { filePath, showSummary, exportResult, exclude, userExcludeDirs, fileTypes } = parseArguments(process.argv);
+/**
+ * 项目的入口
+ */
+function main() {
+    // 解析命令行参数
+    const { filePath, showSummary, exportResult, exclude, userExcludeDirs, fileTypes } = parseArguments(process.argv);
 
-// 验证路径
-if (!validateArguments(filePath)) {
-    console.error('没有提供路径或路径不存在！请检查！');
-    process.exit(1);
+    // 验证路径
+    if (!validateArguments(filePath)) {
+        console.error('没有提供路径或路径不存在！请检查！');
+        process.exit(1);
+    }
+
+    // 解析排除目录参数
+    if (exclude && !userExcludeDirs) {
+        const finalExcludeDirs = parseExcludeDirectories(exclude);
+        readDirectory.calculateTotalLines(filePath, showSummary, finalExcludeDirs, exportResult, fileTypes);
+    } else {
+        readDirectory.calculateTotalLines(filePath, showSummary, userExcludeDirs, exportResult, fileTypes);
+    }
 }
 
-// 解析排除目录参数
-if (exclude && !userExcludeDirs) {
-    const finalExcludeDirs = parseExcludeDirectories(exclude);
-    readDirectory.calculateTotalLines(filePath, showSummary, finalExcludeDirs, exportResult, fileTypes);
-} else {
-    readDirectory.calculateTotalLines(filePath, showSummary, userExcludeDirs, exportResult, fileTypes);
-}
+main();

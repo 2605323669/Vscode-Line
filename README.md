@@ -374,3 +374,9 @@
 
 - **对指定要统计的文件类型BUG进行修复**
 - ![举例](code_line/img/type.png)
+
+- **对表格框架生成进行测试**：
+  - 优化表格生成逻辑：新增通用表格生成函数 `generateTable`，取代原先的多个表格生成函数（如 `generateLanguagesTable`, `generateFilesTable` 等），大幅简化了代码逻辑，增强了复用性。
+  - 统一表格分隔符与填充逻辑：所有表头、数据行和分隔行的生成逻辑统一在 `generateTable` 函数中实现，通过动态指定列宽（`columnWidths`）和内容字段，生成灵活的表格结构。
+
+---
