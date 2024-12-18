@@ -2,6 +2,8 @@ const fs = require("fs")
 const path = require("path")
 const countLines = require("./fileCounter")
 const validFileExtensions = ['.js', '.py', '.java', '.xml', '.html', '.lua', '.cs', '.php', '.css', '.vue', '.ts', '.go', '.c', '.cpp', '.h', '.cc', '.inl', '.rs']
+const blacklist = require('./blackList');
+
 /**
  * 检查文件路径是否在黑名单中
  */
@@ -20,7 +22,6 @@ function isBlackListed(filePath, combinedBlacklist) {
 function processFile(filePath, promises, findFiless) {
     const ext = path.extname(filePath); // 去掉扩展名前的点
     if (findFiless.length > 0 && !findFiless.includes(ext.slice(1))) {
-        // console.log(findFiless);
         return; // 跳过不在用户指定类型中的文件
     }
     if (validFileExtensions.includes(ext)) {
@@ -54,7 +55,6 @@ function processDirectory(filePath, promises, combinedBlacklist, findFiless) {
  * 对传进来的目录进行处理
  */
 function findFiles(filePath, promises, combinedBlacklist, findFiless) {
-
     if (!fs.existsSync(filePath)) {
         console.log("您输入的目录不存在！");
         return;
@@ -67,7 +67,7 @@ function findFiles(filePath, promises, combinedBlacklist, findFiless) {
 
         // 如果是目录，处理目录
         if (stats.isDirectory()) {
-            processDirectory(filePath, promises, blacklist, findFiless);
+            processDirectory(filePath, promises, combinedBlacklist, findFiless);
 
             // 如果是文件，处理文件
         } else if (stats.isFile()) {
@@ -301,6 +301,9 @@ function mergeSubdirectories(directoryStats) {
  * 接受目录参数，对结果进行保存输出
  */
 async function calculateTotalLines(directory, showSummary = false, userExcludeDirs = [], exportResult = false, fileTypes = []) {
+    // let ceshi1 = "D:\\zuoye\\Code-Line\\code_line"
+    // let ceshi2 = "code_line"
+    // console.log(ceshi1.includes(ceshi2));
     const promises = [];
     const combinedBlacklist = [...blacklist, ...userExcludeDirs];
 
@@ -352,40 +355,38 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                     total: 0
                 };
             }
-
             directoryStats[relativeDir].files++;
             directoryStats[relativeDir].code += codeLines;
             directoryStats[relativeDir].comment += commentLineCount;
             directoryStats[relativeDir].blank += emptyLines;
             directoryStats[relativeDir].total += lineCount;
-
+            const languageMapping = {
+                "js": "JavaScript",
+                "py": "Python",
+                "java": "Java",
+                "xml": "XML",
+                "html": "HTML",
+                "lua": "Lua",
+                "cs": "C#",
+                "php": "PHP",
+                "css": "CSS",
+                "vue": "Vue",
+                "ts": "TypeScript",
+                "go": "Go",
+                "c": "C",
+                "cpp": "C++",
+                "h": "C++",
+                "cc": "C++",
+                "inl": "C++",
+                "rs": "Rust"
+            };
+            totalLineCount += lineCount;
+            totalEmptyLines += emptyLines;
+            totalCommentLineCount += commentLineCount;
+            fileCount += 1;
+            totalCodeLines += codeLines;
+            const language = languageMapping[extension] || "Unknown";
             if (!showSummary) {
-                totalLineCount += lineCount;
-                totalEmptyLines += emptyLines;
-                totalCommentLineCount += commentLineCount;
-                fileCount += 1;
-                totalCodeLines += codeLines;
-                const languageMapping = {
-                    "js": "JavaScript",
-                    "py": "Python",
-                    "java": "Java",
-                    "xml": "XML",
-                    "html": "HTML",
-                    "lua": "Lua",
-                    "cs": "C#",
-                    "php": "PHP",
-                    "css": "CSS",
-                    "vue": "Vue",
-                    "ts": "TypeScript",
-                    "go": "Go",
-                    "c": "C",
-                    "cpp": "C++",
-                    "h": "C++",
-                    "cc": "C++",
-                    "inl": "C++",
-                };
-                const language = languageMapping[extension] || "Unknown";
-                //在这里totalCodeLines应该在这，但是现在短暂放在外面
                 extension = language;
                 result.push({
                     dirPath,
@@ -396,7 +397,6 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                     lineCount
                 });
 
-
                 // // 添加列标题
                 // let csvContent = 'dirPath,codeLines\n';
                 // // 提取 dirPath 和 codeLines 并拼接成 CSV 格式
@@ -406,22 +406,23 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                 // // 将数据写入 CSV 文件
                 // fs.writeFileSync(outputPath, csvContent);
 
-                // 更新语言统计信息
-                if (!languageStats[language]) {
-                    languageStats[language] = {
-                        files: 0,
-                        codeLines: 0,
-                        lineCount: 0,
-                        emptyLines: 0,
-                        commentLineCount: 0
-                    };
-                }
-                languageStats[language].files++;
-                languageStats[language].codeLines += codeLines;
-                languageStats[language].lineCount += lineCount;
-                languageStats[language].emptyLines += emptyLines;
-                languageStats[language].commentLineCount += commentLineCount;
+
             }
+            // 更新语言统计信息
+            if (!languageStats[language]) {
+                languageStats[language] = {
+                    files: 0,
+                    codeLines: 0,
+                    lineCount: 0,
+                    emptyLines: 0,
+                    commentLineCount: 0
+                };
+            }
+            languageStats[language].files++;
+            languageStats[language].codeLines += codeLines;
+            languageStats[language].lineCount += lineCount;
+            languageStats[language].emptyLines += emptyLines;
+            languageStats[language].commentLineCount += commentLineCount;
         });
         //进行深拷贝
         Object.keys(directoryStats).forEach(dir => {
@@ -429,16 +430,6 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
         });
         mergeSubdirectories(aggregatedDirectoryStats);
         const combinedStats = [];
-        // if (fileCount !== directoryStats[".(files)"].files) {//未处理如何跟录下没有文件的情况
-        //     combinedStats.push({
-        //         directory: ".",
-        //         files: fileCount,
-        //         code: totalCodeLines,
-        //         comment: totalCommentLineCount,
-        //         blank: totalEmptyLines,
-        //         total: totalLineCount
-        //     });
-        // }
         Object.keys(aggregatedDirectoryStats).forEach(dir => {
             const direct = directoryStats[dir];
             const aggregated = aggregatedDirectoryStats[dir];

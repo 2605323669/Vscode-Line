@@ -61,7 +61,13 @@ npm install code-line-reporter
 在项目根目录下，通过终端运行以下命令来统计指定目录的代码行数等信息：
 
 ```bash
-node index.js <路径> [--summary] [--export] [--exclude <排除目录1> <排除目录2> ...] [--type <文件类型>]
+code-line-reporter <路径> [--summary] [--export] [--exclude <排除目录1> <排除目录2> ...] [--type <文件类型>]
+```
+
+或者通过以下命令来获得帮助：
+
+```bash
+code-line-reporter --help
 ```
 
 其中：
@@ -77,7 +83,7 @@ node index.js <路径> [--summary] [--export] [--exclude <排除目录1> <排除
 - 统计当前目录下的所有文件的代码行数等信息，并简化输出结果：
 
   ```bash
-  code-line-reporter ./ --summary
+  code-line-reporter --summary
   ```
 
 - 统计指定目录（例如 `F:\node_pkg`）的代码行数等信息，并将结果导出到 `output.txt` 文件中：
@@ -105,6 +111,7 @@ node index.js <路径> [--summary] [--export] [--exclude <排除目录1> <排除
 - **默认输出**：不使用 `--summary` 参数时，程序将输出每个文件的详细统计信息，包括文件路径、编程语言、有效行数、注释行数、空行数以及总行数。此外，还会输出总计信息。
 - **简化输出**：使用 `--summary` 参数时，程序将仅输出总计信息，包括文件数、有效行数、注释行数、空行数以及总行数。
 - **导出输出**：使用 `--export` 参数时，程序将上述输出（默认输出或简化输出）保存到 `output.txt` 文件中。
+- **指定统计类型文件**：使用 `--type` 参数时，程序将统计目录下指定文件类型。
 
 ## 注意事项
 

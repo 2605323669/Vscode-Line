@@ -123,8 +123,13 @@ function parseArguments(args) {
         } else if (param === "--export") {
             exportResult = true;
         } else if (param === "--type") {
+            let isType = false;
             while (i + 1 < params.length && !params[i + 1].startsWith("--")) {
+                isType = true;
                 fileTypes.push(params[++i]);
+            }
+            if (!isType) {
+                handleError(`type后面未跟指定类型文件`);
             }
         } else if (param === "--exclude") {
             exclude = true;
