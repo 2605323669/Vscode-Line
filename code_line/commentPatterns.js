@@ -66,6 +66,10 @@ module.exports = {
     inl: {
         singleLine: /^\/\/.*/,
         multiLine: /\/\*[\s\S]*?\*\//g
+    },
+    rs: {
+        singleLine: /^\/\/.*/,
+        multiLine: /\/\*[\s\S]*?\*\//g
     }
     // js: {
     //     singleLine: /^\/\/.*$/,

@@ -340,3 +340,12 @@
 - ![举例](code_line/img/测试.png)
 - ![举例](code_line/img/本项目.png)
 - ![举例](code_line/img/插件.png)
+
+## 12月17日
+
+- **新增 Rust 语言统计功能**： 实现了对 Rust 文件代码行数的统计。  
+
+- **更新项目文档**：`README` 中新增了对 Rust 文件支持的说明。
+
+- **对本功能进行测试**:
+- ![举例](code_line/img/12月17日测试.png)

@@ -1,9 +1,7 @@
 const fs = require("fs")
 const path = require("path")
 const countLines = require("./fileCounter")
-const validFileExtensions = ['.js', '.py', '.java', '.xml', '.html', '.lua', '.cs', '.php', '.css', '.vue', '.ts', '.go','.c','.cpp','.h','.cc','.inl']
-const blacklist = require('./blackList');
-
+const validFileExtensions = ['.js', '.py', '.java', '.xml', '.html', '.lua', '.cs', '.php', '.css', '.vue', '.ts', '.go', '.c', '.cpp', '.h', '.cc', '.inl', '.rs']
 /**
  * 检查文件路径是否在黑名单中
  */
@@ -380,11 +378,11 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                     "vue": "Vue",
                     "ts": "TypeScript",
                     "go": "Go",
-                    "c":"C",
-                    "cpp":"C++",
-                    "h":"C++",
-                    "cc":"C++",
-                    "inl":"C++",
+                    "c": "C",
+                    "cpp": "C++",
+                    "h": "C++",
+                    "cc": "C++",
+                    "inl": "C++",
                 };
                 const language = languageMapping[extension] || "Unknown";
                 //在这里totalCodeLines应该在这，但是现在短暂放在外面
