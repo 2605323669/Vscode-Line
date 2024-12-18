@@ -18,6 +18,32 @@
 - **结果导出**：允许用户将统计结果导出到 `output.txt` 文件中。
 - **指定文件类型统计**：允许用户指定特定的文件类型进行统计，例如仅统计 `.js` 或 `.py` 文件。
 
+## 支持统计的文件类型
+
+支持以下常见编程语言的文件类型：
+
+| 文件类型 | 编程语言      |
+|----------|---------------|
+| `js`     | JavaScript    |
+| `py`     | Python        |
+| `java`   | Java          |
+| `xml`    | XML           |
+| `html`   | HTML          |
+| `lua`    | Lua           |
+| `cs`     | C#            |
+| `php`    | PHP           |
+| `css`    | CSS           |
+| `vue`    | Vue           |
+| `ts`     | TypeScript    |
+| `go`     | Go            |
+| `c`      | C             |
+| `cpp`    | C++           |
+| `h`      | C++           |
+| `cc`     | C++           |
+| `inl`    | C++           |
+
+---
+
 ## 安装与依赖
 
 要运行本项目，您需要确保已安装 Node.js 和 npm（Node 包管理器）。项目的主要依赖是 `code-line-reporter`。

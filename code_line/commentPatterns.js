@@ -46,6 +46,26 @@ module.exports = {
     go: {
         singleLine: /^\/\/.*/,
         multiLine: /\/\*[\s\S]*?\*\//g
+    },
+    c: {
+        singleLine: /^\/\/.*/,
+        multiLine: /\/\*[\s\S]*?\*\//g
+    },
+    cpp: {
+        singleLine: /^\/\/.*/,
+        multiLine: /\/\*[\s\S]*?\*\//g
+    },
+    h: {
+        singleLine: /^\/\/.*/,
+        multiLine: /\/\*[\s\S]*?\*\//g
+    },
+    cc: {
+        singleLine: /^\/\/.*/,
+        multiLine: /\/\*[\s\S]*?\*\//g
+    },
+    inl: {
+        singleLine: /^\/\/.*/,
+        multiLine: /\/\*[\s\S]*?\*\//g
     }
     // js: {
     //     singleLine: /^\/\/.*$/,
