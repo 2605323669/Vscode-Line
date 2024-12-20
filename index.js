@@ -53,9 +53,11 @@ function parseArguments(args) {
             break;
         } else if (param === "--summary") {
             showSummary = true;
-        } else if (param === "--export") {
+        } 
+        else if (param === "--export") {
             exportResult = true;
-        } else if (param === "--type") {
+        } 
+        else if (param === "--type") {
             let isType = false;
             while (i + 1 < params.length && !params[i + 1].startsWith("--")) {
                 isType = true;

@@ -539,21 +539,60 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
         output += "\n\n= = = = = = 编程语言 = = = = = =\n";
         output += generateLanguagesTable(finalResults);
         output += "\n" + outputText;
-        console.log(output);
-        if (exportResult) {
-            fs.writeFile("output.txt", output, { encoding: 'utf8' }, (err) => {
-                if (err) {
-                    console.error(`文件写入失败: ${err.message}`);
-                } else {
-                    console.log(`结果已导出到 output.txt`);
-                }
-            });
-        }
+        // console.log(output);
 
+        exportFile(output, result, combinedStats, finalResults, directory)
     } catch (error) {
         console.error(`统计文件行数时发生错误: ${error.message}`);
     }
 
+}
+
+function exportFile(output, result = [], combinedStats = [], finalResults = [], directory) {
+    // 写入output.txt文件
+    // fs.writeFile("output.txt", output, { encoding: 'utf8' }, (err) => {
+    //     if (err) {
+    //         console.error(`文件写入失败: ${err.message}`);
+    //     } else {
+    //         console.log(`结果已导出到 output.txt`);
+    //     }
+    // });
+
+    // 创建输出文件夹（如果不存在）
+    const outputDir = path.join(directory, 'outputFiles');
+    if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir, { recursive: true }); // 使用{ recursive: true }以确保父目录也被创建（如果需要的话）
+    }
+
+    // 指定output.txt的完整路径
+    const outputPath3 = path.join(outputDir, 'output.txt');
+    // 写入output.txt文件
+    fs.writeFile(outputPath3, output, { encoding: 'utf8' }, (err) => {
+        // if (err) {
+        //     console.error(`文件写入失败: ${err.message}`);
+        // } else {
+        //     console.log(`结果已导出到 ${outputPath}`);
+        // }
+    });
+
+    // 导出第一个CSV文件
+    let csvContent = '文件路径,有效行,注释行,空行,总行\n';
+    csvContent += result.map(item => `${item.dirPath},${item.codeLines},${item.commentLineCount},${item.emptyLines},${item.lineCount}`).join('\n');
+    const outputPath = path.join(outputDir, '文件统计信息.csv');
+    fs.writeFileSync(outputPath, csvContent, { encoding: 'utf8' });
+
+    // 导出第二个CSV文件
+    let csvContent1 = '语言,文件数,有效行,注释行,空行,总行\n';
+    csvContent1 += combinedStats.map(item => `${item.directory},${item.files},${item.code},${item.comment},${item.blank},${item.total}`).join('\n');
+    const outputPath1 = path.join(outputDir, '编程语言信息.csv');
+    fs.writeFileSync(outputPath1, csvContent1, { encoding: 'utf8' });
+
+    // 导出第三个CSV文件
+    let csvContent2 = '文件夹,文件数,有效行,注释行,空行,总行\n';
+    csvContent2 += finalResults.map(item => `${item.directory || '未知文件夹'},${item.files || 0},${item.codeLines || 0},${item.commentLineCount || 0},${item.emptyLines || 0},${item.lineCount || 0}`).join('\n');
+    const outputPath2 = path.join(outputDir, '文件详细信息.csv');
+    fs.writeFileSync(outputPath2, csvContent2, { encoding: 'utf8' });
+    console.log(`结果已导出到 ${outputDir}`);
 }
 
 module.exports = { calculateTotalLines };

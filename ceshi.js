@@ -1,65 +1,148 @@
-// 计算字符串的实际显示宽度（中文字符占 2 个单位，英文占 1 个单位）
-function getDisplayWidth(str) {
-  return str.split('').reduce((width, char) => {
-    return width + (char.match(/[^\x00-\xff]/) ? 2 : 1); // 中文字符宽度为 2，英文为 1
-  }, 0);
-}
+const fs = require('fs');
 
-// 填充字符串到指定宽度，确保中英文混排对齐
-function padToWidth(str, targetWidth) {
-  const displayWidth = getDisplayWidth(str);
-  const padding = targetWidth - displayWidth;
-  return str + ' '.repeat(Math.max(0, padding));
-}
-// 修改的 generateTable 函数
-function generateTable(headers, data, columnWidths) {
-  // 创建分隔行
-  const separator = '+' + columnWidths.map(width => '-'.repeat(width + 2)).join('+') + '+';
+// 统计数据
+const result = [
+  {
+    dirPath: 'D:\\zuoye\\Vscode-Line\\ceshi.js',
+    extension: 'JavaScript',
+    codeLines: 41,
+    commentLineCount: 14,
+    emptyLines: 10,
+    lineCount: 65
+  },
+  {
+    dirPath: 'D:\\zuoye\\Vscode-Line\\code_line\\blackList.js',
+    extension: 'JavaScript',
+    codeLines: 7,
+    commentLineCount: 12,
+    emptyLines: 0,
+    lineCount: 19
+  },
+  {
+    dirPath: 'D:\\zuoye\\Vscode-Line\\code_line\\commentPatterns.js',
+    extension: 'JavaScript',
+    codeLines: 74,
+    commentLineCount: 0,
+    emptyLines: 0,
+    lineCount: 74
+  },
+  {
+    dirPath: 'D:\\zuoye\\Vscode-Line\\code_line\\fileCounter.js',
+    extension: 'JavaScript',
+    codeLines: 57,
+    commentLineCount: 61,
+    emptyLines: 7,
+    lineCount: 125
+  },
+  {
+    dirPath: 'D:\\zuoye\\Vscode-Line\\code_line\\readDirectory.js',
+    extension: 'JavaScript',
+    codeLines: 409,
+    commentLineCount: 102,
+    emptyLines: 53,
+    lineCount: 564
+  },
+  {
+    dirPath: 'D:\\zuoye\\Vscode-Line\\index.js',
+    extension: 'JavaScript',
+    codeLines: 97,
+    commentLineCount: 28,
+    emptyLines: 11,
+    lineCount: 136
+  }
+];
 
-  // 创建标题行
-  const headerRow = '|' + headers.map((header, index) => ` ${padToWidth(header, columnWidths[index])} `).join('|') + '|';
-
-  // 创建数据行
-  const dataRows = data.map(row =>
-    '|' + headers.map((header, index) => {
-      const key = Object.keys(row).find(k => k === header || k === header.replace(/\s+/g, ''));
-      return ` ${padToWidth(String(row[key] || ''), columnWidths[index])} `;
-    }).join('|') + '|'
-  );
-
-  // 组装表格
-  return [separator, headerRow, separator, ...dataRows, separator].join('\n');
-}
-
-// 示例数据
 const combinedStats = [
-  { directory: '.(files)', files: 2, codeLines: 126, comment: 40, emptyLines: 20, total: 186 },
-  { directory: 'code_line', files: 4, codeLines: 544, comment: 179, emptyLines: 60, total: 783 }
+  {
+    directory: '.(files)',
+    files: 2,
+    code: 138,
+    comment: 42,
+    blank: 21,
+    total: 201
+  },
+  {
+    directory: 'code_line',
+    files: 4,
+    code: 547,
+    comment: 175,
+    blank: 60,
+    total: 782
+  }
 ];
 
 const finalResults = [
-  { language: 'JavaScript', files: 6, codeLines: 670, comment: 219, emptyLines: 80, total: 969 }
+  {
+    language: 'JavaScript',
+    files: 6,
+    codeLines: 685,
+    commentLineCount: 217,
+    emptyLines: 81,
+    lineCount: 983
+  }
 ];
 
-const resulit = [
-  { language: 'js', dirPath: 'code_line\\readDirectory.js', codeLines: 565, comment: 53, emptyLines: 106, total: 406 },
-  { language: 'js', dirPath: 'index.js', codeLines: 136, comment: 11, emptyLines: 28, total: 97 }
-];
+// 格式化输出函数，增加对齐的控制
+function formatRow(data, columnsWidth) {
+  return data.map((item, index) => {
+    const strItem = String(item);
+    const padLength = columnsWidth[index] - strItem.length;
+    return strItem + ' '.repeat(padLength);
+  }).join(' | ');
+}
 
-// 显示 combinedStats 表格
-const combinedStatsHeaders = ['directory', 'files', 'codeLines', 'comment', 'emptyLines', 'total'];
-const combinedStatsWidths = [15, 10, 10, 10, 10, 10]; // 每列宽度
-console.log('Combined Stats:\n');
-console.log(generateTable(combinedStatsHeaders, combinedStats, combinedStatsWidths));
+// 获取列宽度
+function getColumnsWidth(headers, rows) {
+  const columnsWidth = headers.map((header, index) => {
+    let maxLength = header.length;
+    rows.forEach(row => {
+      const cellLength = String(row[index]).length;
+      maxLength = Math.max(maxLength, cellLength);
+    });
+    return maxLength;
+  });
+  return columnsWidth;
+}
 
-// 显示 finalResults 表格
-const finalResultsHeaders = ['language', 'files', 'codeLines', 'comment', 'emptyLines', 'total'];
-const finalResultsWidths = [15, 10, 15, 20, 15, 10];
-console.log('\nFinal Results:\n');
-console.log(generateTable(finalResultsHeaders, finalResults, finalResultsWidths));
+// 写入文件
+function writeToFile(filename) {
+  const fileContent = [];
 
-// 显示 resulit 表格
-const resulitHeaders = ['language', 'dirPath', 'codeLines', 'comment', 'emptyLines', 'total'];
-const resulitWidths = [10, 50, 10, 10, 20, 10];
-console.log('\nResulit:\n');
-console.log(generateTable(resulitHeaders, resulit, resulitWidths));
+  // 表头
+  const header1 = ['File Path', 'Extension', 'Code Lines', 'Comment Lines', 'Empty Lines', 'Total Lines'];
+  const header2 = ['Directory', 'Files', 'Code', 'Comment', 'Blank', 'Total'];
+  const header3 = ['Language', 'Files', 'Code Lines', 'Comment Line Count', 'Empty Lines', 'Line Count'];
+
+  // 获取列宽
+  const row1Width = getColumnsWidth(header1, result.map(item => [item.dirPath, item.extension, item.codeLines, item.commentLineCount, item.emptyLines, item.lineCount]));
+  const row2Width = getColumnsWidth(header2, combinedStats.map(item => [item.directory, item.files, item.code, item.comment, item.blank, item.total]));
+  const row3Width = getColumnsWidth(header3, finalResults.map(item => [item.language, item.files, item.codeLines, item.commentLineCount, item.emptyLines, item.lineCount]));
+
+  // 格式化表头和数据
+  fileContent.push(formatRow(header1, row1Width));
+  fileContent.push('-'.repeat(fileContent[0].length));
+  result.forEach(item => {
+    fileContent.push(formatRow([item.dirPath, item.extension, item.codeLines, item.commentLineCount, item.emptyLines, item.lineCount], row1Width));
+  });
+  fileContent.push('');
+
+  fileContent.push(formatRow(header2, row2Width));
+  fileContent.push('-'.repeat(fileContent[0].length));
+  combinedStats.forEach(item => {
+    fileContent.push(formatRow([item.directory, item.files, item.code, item.comment, item.blank, item.total], row2Width));
+  });
+  fileContent.push('');
+
+  fileContent.push(formatRow(header3, row3Width));
+  fileContent.push('-'.repeat(fileContent[0].length));
+  finalResults.forEach(item => {
+    fileContent.push(formatRow([item.language, item.files, item.codeLines, item.commentLineCount, item.emptyLines, item.lineCount], row3Width));
+  });
+
+  // 写入文件
+  fs.writeFileSync(filename, fileContent.join('\n'), 'utf8');
+  console.log(`文件已保存到 ${filename}`);
+}
+
+// 调用函数
+writeToFile('output.txt');
