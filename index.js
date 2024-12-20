@@ -19,7 +19,7 @@ function handleError(message) {
 function printHelp() {
     console.log("用法: node index <路径> [--summary] [--export] [--exclude <排除目录1> <排除目录2> ...] [--type <文件类型>]");
     console.log("  --summary       简化输出结果");
-    console.log("  --export       导出结果到文件");
+    // console.log("  --export       导出结果到文件");
     console.log("  --exclude      排除指定目录");
     console.log("  --type         指定文件类型");
     console.log("  --help         显示帮助信息");
@@ -53,11 +53,9 @@ function parseArguments(args) {
             break;
         } else if (param === "--summary") {
             showSummary = true;
-        } 
-        else if (param === "--export") {
+        } else if (param === "--export") {
             exportResult = true;
-        } 
-        else if (param === "--type") {
+        } else if (param === "--type") {
             let isType = false;
             while (i + 1 < params.length && !params[i + 1].startsWith("--")) {
                 isType = true;
