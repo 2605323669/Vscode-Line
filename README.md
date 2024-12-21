@@ -392,5 +392,5 @@
   - csv、编程语言信息.csv”则记录了每种编程语言的文件数、有效行、注释行、空行和总行数。
 - 在处理完所有文件统计后，`exportFile`函数会根据指定的目录（默认为程序运行目录下的`outputFiles`文件夹）创建输出文件夹（如果不存在），并将生成的CSV文件保存到此文件夹中。
 - 同时，`exportFile`函数还负责将整体的统计结果（包括代码行数统计的总结等）导出到`output.txt`文件中，该文件也保存在`outputFiles`文件夹内。
-- ![举例](code_line/img/erport.png)
-- ![举例](code_line/img/exoprtFiles.png)
+- ![举例](code_line/img/export.png)
+- ![举例](code_line/img/exportFiles.png)
