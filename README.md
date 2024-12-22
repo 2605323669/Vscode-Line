@@ -394,3 +394,10 @@
 - 同时，`exportFile`函数还负责将整体的统计结果（包括代码行数统计的总结等）导出到`output.txt`文件中，该文件也保存在`outputFiles`文件夹内。
 - ![举例](code_line/img/export.png)
 - ![举例](code_line/img/exportFiles.png)
+
+## 12月21日
+
+**文件导出BUG进行修复**：csv文件保存错误。
+- ![举例](code_line/img/文件信息错误.png)
+- ![举例](code_line/img/文件信息正确.png)
+
