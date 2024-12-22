@@ -401,3 +401,5 @@
 - ![举例](code_line/img/文件信息错误.png)
 - ![举例](code_line/img/文件信息正确.png)
 
+**配置打包环境**：利用electron和打包工具electron-builder测试打包效果。
+- ![举例](code_line/img/配置环境.png)

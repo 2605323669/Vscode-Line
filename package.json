@@ -2,9 +2,10 @@
   "name": "code-line-reporter",
   "version": "0.0.2",
   "description": "\u0016\b\b\b:This nom\b\bpm package will be uesd to count the number og li\b\b\b\bf lines of code.",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
   },
   "bin": {
     "code-line-reporter": "./index.js"
@@ -20,5 +21,16 @@
   "license": "ISC",
   "dependencies": {
     "prompt-sync": "^4.2.0"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.example.codecounter",
+    "productName": "Code Line Counter",
+    "win": {
+      "target": "nsis"
+    }
   }
 }
