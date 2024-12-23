@@ -1,18 +1,97 @@
-<!--index.html-->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <title>Hello World!</title>
-  </head>
-  <body>
-    <h1>Hello World!</h1>
-    We are using Node.js <span id="node-version"></span>,
-    Chromium <span id="chrome-version"></span>,
-    and Electron <span id="electron-version"></span>.
 
-    <script src="./renderer.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>代码行统计工具</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1>代码行统计工具V1.0</h1>
+    <div class="controls">
+      <label for="language-select">请选择程序语言</label>
+      <select id="language-select">
+        <option value="all">所有文件类型</option>
+        <option value="js">JavaScript</option>
+        <option value="py">Python</option>
+      </select>
+      <button id="select-file">选择文件</button>
+      <button id="select-dir">选择目录</button>
+    </div>
+    <!-- 添加一个显示用户选择路径的区域 -->
+    <div id="selected-path" style="margin-top: 20px; font-weight: bold; color: #333;">
+      <!-- 动态显示路径 -->
+      当前选择路径: 无
+    </div>
+    <br>
+    <!-- 添加切换按钮 -->
+    <div class="table-controls">
+      <button class="table-switch" data-table="file-stats">文件统计信息</button>
+      <button class="table-switch" data-table="language-stats">编程语言信息</button>
+      <button class="table-switch" data-table="file-details">文件详细信息</button>
+    </div>
+    <br>
+    <!-- 文件统计信息表格 -->
+    <div id="file-stats" class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>文件名</th>
+            <th>编程语言</th>
+            <th>代码数</th>
+            <th>注释数</th>
+            <th>空行数</th>
+            <th>总行数</th>
+          </tr>
+        </thead>
+        <tbody id="file-list">
+          <!-- 动态填充文件统计信息 -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 编程语言信息表格 -->
+    <div id="language-stats" class="table-container" style="display: none;">
+      <table>
+        <thead>
+          <tr>
+            <th>语言</th>
+            <th>文件数</th>
+            <th>有效行</th>
+            <th>注释行</th>
+            <th>空行</th>
+            <th>总行</th>
+          </tr>
+        </thead>
+        <tbody id="language-list">
+          <!-- 动态填充编程语言统计信息 -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 文件详细信息表格 -->
+    <div id="file-details" class="table-container" style="display: none;">
+      <table>
+        <thead>
+          <tr>
+            <th>文件夹</th>
+            <th>文件数</th>
+            <th>有效行</th>
+            <th>注释行</th>
+            <th>空行</th>
+            <th>总行</th>
+          </tr>
+        </thead>
+        <tbody id="file-details-list">
+          <!-- 动态填充文件详细信息 -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script src="renderer.js"></script>
+</body>
+
 </html>

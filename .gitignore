@@ -4,3 +4,4 @@ yarn.lock
 outputFiles
 .VSCodeCounter
 .npmignore
+dist
