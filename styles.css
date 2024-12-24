@@ -37,15 +37,91 @@ button:hover {
 table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
+    /* 固定表格布局，确保列宽一致 */
 }
 
 th,
 td {
     padding: 8px 12px;
-    text-align: center;
+    text-align: left;
     border: 1px solid #ddd;
+    box-sizing: border-box;
+    word-wrap: break-word;
+    /* 自动换行 */
+    word-break: break-word;
+    /* 处理长单词换行 */
 }
 
 th {
     background-color: #f2f2f2;
+}
+
+thead {
+    position: sticky;
+    top: 0;
+    background-color: #f9f9f9;
+    z-index: 10;
+}
+
+tbody {
+    display: block;
+    max-height: 500px;
+    /* 限制表格高度 */
+    overflow-y: auto;
+    /* 启用垂直滚动条 */
+    width: 100%;
+}
+
+thead tr {
+    display: table;
+    width: 100%;
+    /* 保证表头宽度正确 */
+    table-layout: fixed;
+    /* 固定布局 */
+}
+
+tbody tr {
+    display: table;
+    width: 100%;
+    /* 保证表格内容宽度与表头一致 */
+    table-layout: fixed;
+    /* 固定布局 */
+}
+
+/* 选定某些列宽度（可选） */
+th:nth-child(1),
+td:nth-child(1) {
+    width:30%;
+    /* 第一列宽度 */
+}
+
+th:nth-child(2),
+td:nth-child(2) {
+    width: 14%;
+    /* 第二列宽度 */
+}
+
+th:nth-child(3),
+td:nth-child(3) {
+    width: 14%;
+    /* 第三列宽度 */
+}
+
+th:nth-child(4),
+td:nth-child(4) {
+    width: 14%;
+    /* 第四列宽度 */
+}
+
+th:nth-child(5),
+td:nth-child(5) {
+    width: 14%;
+    /* 第四列宽度 */
+}
+
+th:nth-child(6),
+td:nth-child(6) {
+    width: 14%;
+    /* 第四列宽度 */
 }

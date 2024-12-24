@@ -343,6 +343,10 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
     const combinedBlacklist = [...blacklist, ...userExcludeDirs];
     const start1 = Date.now();
 
+    const result = [];//用来统计每个文件行数信息
+    const finalResults = [];
+    const combinedStats = [];
+
     findFiles(directory, promises, combinedBlacklist, fileTypes);
 
     const end1 = Date.now();
@@ -358,11 +362,11 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
 
         const date = new Date();
         const formattedDate = formatDate(date);
-        const result = [];//用来统计每个文件行数信息
-        const finalResults = [];
+        // const result = [];//用来统计每个文件行数信息
+        // const finalResults = [];
         const directoryStats = {};//用来统计文件夹内的文件信息（不包括文件内还有文件夹）
         const aggregatedDirectoryStats = {};//用来统计文件夹还有文件夹的信息
-        const combinedStats = [];//用来合并整个统计文件夹的信息
+        // const combinedStats = [];//用来合并整个统计文件夹的信息
 
         let totalLineCount = 0;
         let totalEmptyLines = 0;
@@ -426,6 +430,7 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
             const language = languageMapping[extension] || "Unknown";
             if (!showSummary) {
                 extension = language;
+                dirPath = path.relative(directory, dirPath)
                 result.push({
                     dirPath,
                     extension,
@@ -434,18 +439,8 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                     emptyLines,
                     lineCount
                 });
-
-                // // 添加列标题
-                // let csvContent = 'dirPath,codeLines\n';
-                // // 提取 dirPath 和 codeLines 并拼接成 CSV 格式
-                // csvContent += result.map(item => `${item.dirPath},${item.codeLines}`).join('\n');
-                // // 指定导出文件路径
-                // const outputPath = path.join(__dirname, 'codeLines_with_dirPath.csv');
-                // // 将数据写入 CSV 文件
-                // fs.writeFileSync(outputPath, csvContent);
-
-
             }
+            
             // 更新语言统计信息
             if (!languageStats[language]) {
                 languageStats[language] = {
@@ -545,7 +540,7 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
     } catch (error) {
         console.error(`统计文件行数时发生错误: ${error.message}`);
     }
-
+    return [result, combinedStats, finalResults];
 }
 
 function exportFile(output, result = [], combinedStats = [], finalResults = [], directory) {

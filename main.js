@@ -34,6 +34,11 @@ ipcMain.handle('dialog:openDirectory', async () => {
     return result.filePaths;
 });
 
+// 监听前端发出的计算总行数请求
+ipcMain.handle('calculateTotalLines', async (event, filePath) => {
+    return calculateTotalLines(filePath);
+});
+
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
