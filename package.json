@@ -1,5 +1,5 @@
 {
-  "name": "code-line-reporter",
+  "name": "code-line-exporter",
   "version": "1.0.2",
   "description": "This npm package will be used to count the number of lines of code.",
   "main": "index.js",
