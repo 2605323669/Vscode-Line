@@ -132,5 +132,24 @@ function main() {
         readDirectory.calculateTotalLines(filePath, showSummary, userExcludeDirs, exportResult, fileTypes);
     }
 }
+// function getConfig() {
+//     // 读取文件，这里使用同步读取只是为了示例简单化
+//     const rawdata = fs.readFileSync('config.json');
+//     const config = JSON.parse(rawdata);
+//     return config;
+// }
+
+// function main() {
+//     const config = getConfig();
+
+//     // 验证路径
+//     if (!validateArguments(config.filePath)) {
+//         console.error('没有提供路径或路径不存在！请检查！');
+//         process.exit(1);
+//     }
+
+//     // 使用配置中的数据
+//     readDirectory.calculateTotalLines(config.filePath, config.showSummary, config.userExcludeDirs, config.exportResult, config.fileTypes);
+// }
 
 main();

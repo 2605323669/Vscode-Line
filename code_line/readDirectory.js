@@ -440,7 +440,7 @@ async function calculateTotalLines(directory, showSummary = false, userExcludeDi
                     lineCount
                 });
             }
-            
+
             // 更新语言统计信息
             if (!languageStats[language]) {
                 languageStats[language] = {
@@ -573,19 +573,19 @@ function exportFile(output, result = [], combinedStats = [], finalResults = [], 
     // 导出第一个CSV文件
     let csvContent = '文件路径,有效行,注释行,空行,总行\n';
     csvContent += result.map(item => `${item.dirPath},${item.codeLines},${item.commentLineCount},${item.emptyLines},${item.lineCount}`).join('\n');
-    const outputPath = path.join(outputDir, '文件统计信息.csv');
+    const outputPath = path.join(outputDir, '文件详细信息.csv');
     fs.writeFileSync(outputPath, csvContent, { encoding: 'utf8' });
 
     // 导出第二个CSV文件
     let csvContent1 = '文件夹,文件数,有效行,注释行,空行,总行\n';
     csvContent1 += combinedStats.map(item => `${item.directory},${item.files},${item.code},${item.comment},${item.blank},${item.total}`).join('\n');
-    const outputPath1 = path.join(outputDir, '编程语言信息.csv');
+    const outputPath1 = path.join(outputDir, '文件夹统计信息.csv');
     fs.writeFileSync(outputPath1, csvContent1, { encoding: 'utf8' });
 
     // 导出第三个CSV文件
     let csvContent2 = '语言,文件数,有效行,注释行,空行,总行\n';
     csvContent2 += finalResults.map(item => `${item.language || '未知文件夹'},${item.files || 0},${item.codeLines || 0},${item.commentLineCount || 0},${item.emptyLines || 0},${item.lineCount || 0}`).join('\n');
-    const outputPath2 = path.join(outputDir, '文件详细信息.csv');
+    const outputPath2 = path.join(outputDir, '编程语言信息.csv');
     fs.writeFileSync(outputPath2, csvContent2, { encoding: 'utf8' });
     console.log(`结果已导出到 ${outputDir}`);
 }
