@@ -132,6 +132,8 @@ function main() {
         readDirectory.calculateTotalLines(filePath, showSummary, userExcludeDirs, exportResult, fileTypes);
     }
 }
+
+// //通过配置文件进行执行
 // function getConfig() {
 //     // 读取文件，这里使用同步读取只是为了示例简单化
 //     const rawdata = fs.readFileSync('config.json');
@@ -148,6 +150,8 @@ function main() {
 //         process.exit(1);
 //     }
 
+//     // console.log(config.userExcludeDirs);
+    
 //     // 使用配置中的数据
 //     readDirectory.calculateTotalLines(config.filePath, config.showSummary, config.userExcludeDirs, config.exportResult, config.fileTypes);
 // }

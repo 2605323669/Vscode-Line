@@ -1,7 +1,7 @@
 {
   "name": "code-line-exporter",
   "version": "1.0.2",
-  "description": "This npm package will be used to count the number of lines of code.",
+  "description": "This project will be used to count the number of lines of code.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -32,6 +32,12 @@
     "productName": "Code Line Counter",
     "win": {
       "target": "nsis"
-    }
+    },
+    "files": [
+      "!index.js",
+      "!code_line/img",
+      "!code_line/README.md",
+      "!outputFiles"
+    ]
   }
 }

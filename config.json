@@ -3,6 +3,10 @@
     "showSummary": false,
     "exportResult": false,
     "exclude": false,
-    "userExcludeDirs": [],
-    "fileTypes": []
+    "userExcludeDirs": [
+        "code_line"
+    ],
+    "fileTypes": [
+        "js"
+    ]
 }

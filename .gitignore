@@ -5,3 +5,4 @@ outputFiles
 .VSCodeCounter
 .npmignore
 dist
+test
