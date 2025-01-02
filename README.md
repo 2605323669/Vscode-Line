@@ -51,7 +51,7 @@
 
 ### 安装项目依赖
 
-在项目根目录下运行以下命令以安装项目依赖：
+在项目根目录下运行以下命令以安装项目依赖：(如果采取本地安装的方式，输入安装以下来；如果是全局安装的方式，就要去掉npx)
 
 ```bash
 npm install code-line-reporter
@@ -62,13 +62,13 @@ npm install code-line-reporter
 在项目根目录下，通过终端运行以下命令来统计指定目录的代码行数等信息：
 
 ```bash
-code-line-reporter <路径> [--summary] [--export] [--exclude <排除目录1> <排除目录2> ...] [--type <文件类型>]
+npx code-line-reporter <路径> [--summary] [--export] [--exclude <排除目录1> <排除目录2> ...] [--type <文件类型>]
 ```
 
 或者通过以下命令来获得帮助：
 
 ```bash
-code-line-reporter --help
+npx code-line-reporter --help
 ```
 
 其中：
@@ -84,7 +84,7 @@ code-line-reporter --help
 - 统计当前目录下的所有文件的代码行数等信息，并简化输出结果：
 
   ```bash
-  code-line-reporter --summary
+  npx code-line-reporter --summary
   ```
 
 ~~- 统计指定目录（例如 `F:\node_pkg`）的代码行数等信息，并将结果导出到 `output.txt` 文件中：~~
@@ -96,13 +96,13 @@ code-line-reporter --help
 - 统计指定目录（例如 `F:\node_pkg`）的代码行数等信息，排除 `test` 和 `build` 目录：
 
   ```bash
-  code-line-reporter F:\node_pkg --exclude test build
+  npx code-line-reporter F:\node_pkg --exclude test build
   ```
 
 - 统计指定目录（例如 `F:\node_pkg`）的代码行数等信息，仅统计 `.js` 和 `.py` 文件：
 
   ```bash
-  code-line-reporter F:\node_pkg --type js py
+  npx code-line-reporter F:\node_pkg --type js py
   ```
 
   **注意**：上述命令中的参数和路径可根据实际情况进行调整，且参数之间可组合使用。

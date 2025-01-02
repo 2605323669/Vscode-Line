@@ -32,12 +32,6 @@
     "productName": "Code Line Counter",
     "win": {
       "target": "nsis"
-    },
-    "files": [
-      "!index.js",
-      "!code_line/img",
-      "!code_line/README.md",
-      "!outputFiles"
-    ]
+    }
   }
 }
